@@ -1,0 +1,174 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* FULL SCREEN CONTAINER */
+.login-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0f0f0f;
+}
+
+/* LEFT SIDE (FORM) */
+.login-left {
+  width: 35%;
+  background-color: #ffffff;
+  padding: 70px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand {
+  font-size: 14px;
+  color:black;
+  margin-bottom: 35px;
+}
+
+.login-left h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #0f0f0f;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 30px;
+}
+
+.login-form label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+  color: #0f0f0f;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #ef4444;
+}
+
+/* REMEMBER + FORGOT */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 25px;
+}
+
+.forgot {
+  color: #ef4444;
+  cursor: pointer;
+}
+
+/* BUTTONS */
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #dc2626;
+}
+
+/* DIVIDER */
+.divider {
+  text-align: center;
+  margin: 25px 0;
+  font-size: 12px;
+  color: #999;
+}
+
+/* GOOGLE BUTTON */
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  color:black;
+}
+
+.google-btn span {
+  color: rgb(red, green, blue);
+  font-weight: bold;
+  margin-right: 8px;
+}
+.google-btn .logo{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-top: 10px;
+
+}
+/* BOTTOM TEXT */
+.signup-text {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 13px;
+}
+
+.signup-text span {
+  color: #ef4444;
+  cursor: pointer;
+}
+
+/* RIGHT SIDE (IMAGE / CONTENT) */
+.login-right {
+  width: 65%;
+  background-image: url("https://images.unsplash.com/photo-1551288049-bebda4e38f71");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* TEXT OVER IMAGE */
+.overlay {
+  position: absolute;
+  bottom: 80px;
+  left: 80px;
+  max-width: 520px;
+  color: white;
+}
+
+.tag {
+  font-size: 12px;
+  color: #ef4444;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.overlay h1 {
+  font-size: 36px;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.desc {
+  font-size: 14px;
+  opacity: 0.9;
+}
