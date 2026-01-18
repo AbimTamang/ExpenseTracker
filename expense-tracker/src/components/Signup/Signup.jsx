@@ -1,59 +1,55 @@
-import React from "react";
 import "./Signup.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (!name || !email || !password || !confirmPassword) {
+      alert("All fields required");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Signup successful");
+        navigate("/");
+      } else {
+        alert(data.message);
+      }
+    } catch {
+      alert("Server error");
+    }
+  };
+
   return (
-    <div className="signup-container">
-      {/* Left Section */}
-      <div className="signup-left">
-        <h4 className="brand">ExpenseTracker</h4>
-
-        <h1>Create your account</h1>
-        <p className="subtitle">
-          Start tracking your expenses today. Join thousands of users managing
-          their finances smarter.
-        </p>
-
-        <button className="google-btn">Sign up with Google</button>
-
-        <div className="divider">
-          <span>Or continue with email</span>
-        </div>
-
-        <form className="signup-form">
-          <label>Full Name</label>
-          <input type="text" placeholder="e.g. John Doe" />
-
-          <label>Email Address</label>
-          <input type="email" placeholder="e.g. john@example.com" />
-
-          <label>Password</label>
-          <input type="password" placeholder="Create a strong password" />
-
-          <label>Confirm Password</label>
-          <input type="password" placeholder="Repeat your password" />
-
-          <button className="create-btn">Create Account</button>
-        </form>
-
-        <p className="terms">
-          By signing up, you agree to our{" "}
-          <span>Terms of Service</span> and <span>Privacy Policy</span>
-        </p>
-
-        <p className="login-link">
-          Already have an account? <span>Log in</span>
-        </p>
-      </div>
-
-      {/* Right Section */}
-      <div className="signup-right">
-        <img
-          src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e"
-          alt="Money growth"
-        />
-      </div>
-    </div>
+    <form onSubmit={handleSignup}>
+      <input placeholder="Name" onChange={(e) => setName(e.target.value)} />
+      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+      <input type="password" placeholder="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} />
+      <button type="submit">Signup</button>
+    </form>
   );
 };
 
