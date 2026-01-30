@@ -16,24 +16,31 @@ const Dashboard = () => {
   };
 
   // 🔒 PROTECT DASHBOARD (BACKEND CHECK)
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+useEffect(() => {
+  const token = localStorage.getItem("token");
 
-    if (!token) {
-      navigate("/");
-      return;
-    }
+  if (!token) {
+    navigate("/");
+    return;
+  }
 
-    fetch("http://localhost:5000/api/dashboard", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => {
+  fetch("http://localhost:5000/api/dashboard", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => {
       if (res.status === 401) {
-        handleLogout();
+        localStorage.clear();
+        navigate("/");
       }
+    })
+    .catch(() => {
+      localStorage.clear();
+      navigate("/");
     });
-  }, []);
+}, [navigate]);
+
 
   return (
     <div className="app">

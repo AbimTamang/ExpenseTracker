@@ -122,7 +122,7 @@
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    margin-top: 10px;
+    margin-top: 4px;
 
 }
 /* BOTTOM TEXT */
@@ -130,6 +130,7 @@
   text-align: center;
   margin-top: 25px;
   font-size: 13px;
+  color: #0f0f0f;
 }
 
 .signup-text span {
