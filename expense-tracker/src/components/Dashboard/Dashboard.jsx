@@ -1,142 +1,406 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from "recharts";
+
 import "./Dashboard.css";
 
 const Dashboard = () => {
+
   const navigate = useNavigate();
 
-  // Get logged-in user's name
   const name = localStorage.getItem("name");
-
-  // 🔴 LOGOUT FUNCTION
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("name");
-    navigate("/");
-  };
-
-  // 🔒 PROTECT DASHBOARD (BACKEND CHECK)
-useEffect(() => {
   const token = localStorage.getItem("token");
 
-  if (!token) {
-    navigate("/");
-    return;
-  }
 
-  fetch("http://localhost:5000/api/dashboard", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => {
-      if (res.status === 401) {
-        localStorage.clear();
-        navigate("/");
+  const [summary, setSummary] = useState({
+    income: 0,
+    expense: 0,
+    balance: 0
+  });
+
+  const [transactions, setTransactions] = useState([]);
+
+  const [chartData, setChartData] = useState([]);
+
+
+
+  // FETCH SUMMARY
+
+  const fetchSummary = async () => {
+
+    const res = await fetch(
+      "http://localhost:5000/api/expenses/summary",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    })
-    .catch(() => {
-      localStorage.clear();
-      navigate("/");
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      setSummary(data.summary);
+
+    }
+
+  };
+
+
+
+  // FETCH TRANSACTIONS
+
+  const fetchTransactions = async () => {
+
+    const res = await fetch(
+      "http://localhost:5000/api/expenses/list",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      setTransactions(data.transactions);
+
+      prepareChart(data.transactions);
+
+    }
+
+  };
+
+
+
+  // CHART DATA
+
+  const prepareChart = (data) => {
+
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    let result = months.map(month => ({
+      month,
+      income: 0,
+      expense: 0
+    }));
+
+
+    data.forEach(item => {
+
+      const date = new Date(item.created_at);
+
+      const monthIndex = date.getMonth();
+
+      if (item.type === "income") {
+
+        result[monthIndex].income += Number(item.amount);
+
+      }
+
+      else {
+
+        result[monthIndex].expense += Number(item.amount);
+
+      }
+
     });
-}, [navigate]);
+
+    setChartData(result);
+
+  };
+
+
+
+
+  useEffect(() => {
+
+    if (!token) {
+
+      navigate("/");
+      return;
+
+    }
+
+    fetchSummary();
+    fetchTransactions();
+
+  }, []);
+
+
+
+
+  // DELETE
+
+  const deleteTransaction = async (id) => {
+
+    await fetch(
+      `http://localhost:5000/api/expenses/delete/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    fetchSummary();
+    fetchTransactions();
+
+  };
+
+
+
+  // LOGOUT
+
+  const logout = () => {
+
+    localStorage.clear();
+
+    navigate("/");
+
+  };
+
+
 
 
   return (
-    <div className="app">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <h2 className="logo">Expense Tracker</h2>
 
-        <nav>
-          <a className="active">Dashboard</a>
-          <a>Transactions</a>
-          <a>Wallet</a>
-          <a>Analytics</a>
-          <a>Settings</a>
-        </nav>
+    <div className="dashboard">
 
-        <div className="profile">
-          <div className="avatar"></div>
-          <span>{name || "User"}</span>
+
+
+      {/* SIDEBAR */}
+
+      <div className="sidebar">
+
+
+        <div>
+
+          <h2>ExpenseTracker</h2>
+
+          <p onClick={() => navigate("/dashboard")}>
+            Dashboard
+          </p>
+
+          <p onClick={() => navigate("/transactions")}>
+            Transactions
+          </p>
+
+          <p onClick={() => navigate("/analytics")}>
+            Analytics
+          </p>
+
+          <p onClick={() => navigate("/wallet")}>
+            Wallet
+          </p>
+
+          <p onClick={() => navigate("/settings")}>
+            Settings
+          </p>
+
         </div>
 
-        {/* 🔴 LOGOUT BUTTON */}
+
+
         <button
-          onClick={handleLogout}
-          style={{
-            margin: "20px",
-            padding: "10px",
-            cursor: "pointer",
-          }}
+          className="logout-btn"
+          onClick={logout}
         >
           Logout
         </button>
-      </aside>
 
-      {/* Main Content */}
-      <main className="main">
-        <div className="main-container">
-          <header className="header">
-            <div>
-              <h1>Hello, {name || "User"}</h1>
-              <p>Here is your financial overview for Dec, 2025</p>
-            </div>
-            <button className="btn">Add Transaction</button>
-          </header>
 
-          {/* Cards */}
-          <section className="cards">
-            <div className="card green">
-              <p>Total Income</p>
-              <h3>Rs 4,250.00</h3>
-              <span>+8.5%</span>
-            </div>
-            <div className="card red">
-              <p>Total Expenses</p>
-              <h3>Rs 1,200.50</h3>
-              <span>-2.1%</span>
-            </div>
-            <div className="card blue">
-              <p>Savings</p>
-              <h3>Rs 12,500.00</h3>
-              <span>+5.4%</span>
-            </div>
-          </section>
 
-          {/* Content Row */}
-          <section className="content">
-            <div className="chart">
-              <h3>Income vs Saving</h3>
-              <div className="chart-box">Chart Placeholder</div>
-            </div>
+      </div>
 
-            <div className="transactions">
-              <h3>Recent Transactions</h3>
-              <ul>
-                <li>
-                  <span>Grocery Store</span>
-                  <span className="neg">-Rs 120.50</span>
-                </li>
-                <li>
-                  <span>Freelance Payment</span>
-                  <span className="pos">+Rs 850.00</span>
-                </li>
-                <li>
-                  <span>Netflix Sub</span>
-                  <span className="neg">-Rs 15.99</span>
-                </li>
-                <li>
-                  <span>Gym Membership</span>
-                  <span className="neg">-Rs 45.00</span>
-                </li>
-              </ul>
-            </div>
-          </section>
+
+
+
+
+      {/* MAIN */}
+
+      <div className="main">
+
+
+
+        {/* HEADER */}
+
+        <div className="header">
+
+          <h1>Hello, {name}</h1>
+
+          <button
+            className="add-btn"
+            onClick={() => navigate("/transactions")}
+          >
+
+            + Add Transaction
+
+          </button>
+
         </div>
-      </main>
+
+
+
+
+        {/* CARDS */}
+
+        <div className="cards">
+
+
+          <div className="card income">
+
+            <h3>Income</h3>
+
+            <p>₹ {summary.income}</p>
+
+          </div>
+
+
+          <div className="card expense">
+
+            <h3>Expense</h3>
+
+            <p>₹ {summary.expense}</p>
+
+          </div>
+
+
+          <div className="card balance">
+
+            <h3>Balance</h3>
+
+            <p>₹ {summary.balance}</p>
+
+          </div>
+
+
+        </div>
+
+
+
+
+        {/* CHART */}
+
+        <div className="chart">
+
+          <h3>Monthly Overview</h3>
+
+
+          <ResponsiveContainer width="100%" height={300}>
+
+
+            <BarChart data={chartData}>
+
+
+              <XAxis dataKey="month" />
+
+              <YAxis />
+
+              <Tooltip />
+
+              <Legend />
+
+
+
+              <Bar
+                dataKey="income"
+                fill="#00c896"
+              />
+
+
+              <Bar
+                dataKey="expense"
+                fill="#ff4d4d"
+              />
+
+
+            </BarChart>
+
+
+          </ResponsiveContainer>
+
+
+        </div>
+
+
+
+
+        {/* RECENT */}
+
+        <div className="recent">
+
+          <h3>Recent Transactions</h3>
+
+
+          {
+
+            transactions.slice(0,5).map(item => (
+
+              <div
+                key={item.id}
+                className="transaction"
+              >
+
+                <span>
+
+                  {item.title}
+
+                </span>
+
+
+                <span>
+
+                  ₹ {item.amount}
+
+                </span>
+
+
+                <button
+                  onClick={() =>
+                    deleteTransaction(item.id)
+                  }
+                >
+
+                  Delete
+
+                </button>
+
+
+              </div>
+
+            ))
+
+          }
+
+
+        </div>
+
+
+
+      </div>
+
+
     </div>
+
   );
+
 };
 
 export default Dashboard;

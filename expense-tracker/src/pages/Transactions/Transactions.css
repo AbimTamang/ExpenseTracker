@@ -1,0 +1,240 @@
+/* SAME DASHBOARD LAYOUT */
+
+.app {
+
+  display: flex;
+
+  height: 100vh;
+
+}
+
+
+/* SIDEBAR */
+
+.sidebar {
+
+  width: 230px;
+
+  background: #ffffff;
+
+  padding: 20px;
+
+  border-right: 1px solid #eee;
+
+}
+
+
+.sidebar nav p {
+
+  margin: 15px 0;
+
+  cursor: pointer;
+
+}
+
+
+.sidebar nav p:hover {
+
+  color: #6366f1;
+
+}
+
+
+.active {
+
+  font-weight: bold;
+
+  color: #6366f1;
+
+}
+
+
+.profile {
+
+  margin-top: 50px;
+
+}
+
+
+
+/* MAIN */
+
+.main {
+
+  flex: 1;
+
+  padding: 40px;
+
+  background: #f1f5f9;
+
+}
+
+
+/* ALIGN FIX */
+
+.main-container {
+
+  max-width: 1000px;
+
+  margin: auto;
+
+}
+
+
+
+/* CARD */
+
+.card {
+
+  background: linear-gradient(135deg, #667eea, #764ba2);
+
+  padding: 30px;
+
+  border-radius: 20px;
+
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+
+  color: white;
+
+}
+
+
+
+/* HEADER */
+
+.card-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+
+}
+
+
+
+/* FORM */
+
+.form {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+}
+
+
+.form input,
+
+.form select {
+
+  padding: 14px;
+
+  border-radius: 10px;
+
+  border: none;
+
+  background: rgba(255,255,255,0.85);
+
+  color: black;            
+
+  font-weight: 500;
+
+  outline: none;
+
+}
+
+
+.form input::placeholder {
+
+  color: black
+
+}
+
+
+/* BUTTON */
+
+.form button {
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: linear-gradient(90deg, #00f5a0, #00d9f5);
+
+  color: black;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+
+.form button:hover {
+
+  transform: scale(1.02);
+
+}
+
+
+
+/* TABLE */
+
+table {
+
+  width: 100%;
+
+  margin-top: 30px;
+
+}
+
+
+th {
+
+  text-align: left;
+
+  padding: 12px;
+
+}
+
+
+td {
+
+  padding: 12px;
+
+  border-top: 1px solid rgba(255,255,255,0.2);
+
+}
+
+
+tr:hover {
+
+  background: rgba(255,255,255,0.1);
+
+}
+
+
+/* COLORS */
+
+.income {
+
+  color: #00f5a0;
+
+  font-weight: bold;
+
+}
+
+
+.expense {
+
+  color: #ff6b6b;
+
+  font-weight: bold;
+
+}
