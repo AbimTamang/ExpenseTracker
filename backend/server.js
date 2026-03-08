@@ -5,6 +5,8 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const expenseRoutes = require("./routes/expenses");
+const investmentRoutes = require("./routes/investments");
+const goalRoutes = require("./routes/goals");
 
 
 const app = express();
@@ -18,6 +20,8 @@ app.use(express.json());
 // AUTH ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/investments", investmentRoutes);
+app.use("/api/goals", goalRoutes);
 
 
 

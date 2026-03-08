@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // AUTH
 import Login from "./components/Login/Login";
@@ -17,34 +18,31 @@ import Analytics from "./pages/Analytics/Analytics";
 import Settings from "./pages/Setting/Settings";
 import Wallet from "./pages/Wallet/Wallet";
 
-
 function App() {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
 
   return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <BrowserRouter>
+        <Routes>
 
-    <BrowserRouter>
+          {/* AUTH */}
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-      <Routes>
+          {/* MAIN */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/wallet" element={<Wallet />} />
 
-        {/* AUTH */}
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-        {/* MAIN */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/wallet" element={<Wallet />} />
-
-      </Routes>
-
-    </BrowserRouter>
-
+        </Routes>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
-
 }
 
 export default App;

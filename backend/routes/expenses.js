@@ -57,20 +57,20 @@ router.post("/add", async (req, res) => {
        (user_id,title,amount,type,category)
        VALUES ($1,$2,$3,$4,$5)`,
 
-      [userId,title,amount,type,category]
+      [userId, title, amount, type, category]
 
     );
 
 
     res.json({
 
-      success:true
+      success: true
 
     });
 
   }
 
-  catch(err){
+  catch (err) {
 
     console.log(err);
 
@@ -86,9 +86,9 @@ router.post("/add", async (req, res) => {
    GET ALL TRANSACTIONS
 ====================== */
 
-router.get("/list", async (req,res)=>{
+router.get("/list", async (req, res) => {
 
-  try{
+  try {
 
     const userId =
       verifyToken(req);
@@ -109,7 +109,7 @@ router.get("/list", async (req,res)=>{
 
     res.json({
 
-      success:true,
+      success: true,
 
       transactions:
         result.rows
@@ -118,7 +118,7 @@ router.get("/list", async (req,res)=>{
 
   }
 
-  catch(err){
+  catch (err) {
 
     console.log(err);
 
@@ -135,9 +135,9 @@ router.get("/list", async (req,res)=>{
    SUMMARY
 ====================== */
 
-router.get("/summary", async (req,res)=>{
+router.get("/summary", async (req, res) => {
 
-  try{
+  try {
 
     const userId =
       verifyToken(req);
@@ -182,13 +182,13 @@ router.get("/summary", async (req,res)=>{
 
     res.json({
 
-      success:true,
+      success: true,
 
-      summary:{
+      summary: {
 
-        income:incomeValue,
+        income: incomeValue,
 
-        expense:expenseValue,
+        expense: expenseValue,
 
         balance:
           incomeValue - expenseValue
@@ -199,7 +199,7 @@ router.get("/summary", async (req,res)=>{
 
   }
 
-  catch(err){
+  catch (err) {
 
     console.log(err);
 
@@ -217,9 +217,9 @@ router.get("/summary", async (req,res)=>{
    DELETE
 ====================== */
 
-router.delete("/delete/:id", async (req,res)=>{
+router.delete("/delete/:id", async (req, res) => {
 
-  try{
+  try {
 
     const userId =
       verifyToken(req);
@@ -235,27 +235,67 @@ router.delete("/delete/:id", async (req,res)=>{
        WHERE id=$1
        AND user_id=$2`,
 
-      [id,userId]
+      [id, userId]
 
     );
 
 
     res.json({
-
-      success:true
-
+      success: true
     });
 
   }
-
-  catch(err){
-
+  catch (err) {
     console.log(err);
-
   }
 
 });
 
 
+/* ======================
+   EXPORT TO CSV
+====================== */
+
+router.get("/export", async (req, res) => {
+  try {
+    const userId = verifyToken(req);
+
+    const result = await pool.query(
+      `SELECT title, amount, type, category, created_at 
+       FROM expenses 
+       WHERE user_id=$1 
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "No data to export" });
+    }
+
+    const fields = ["Title", "Amount", "Type", "Category", "Date"];
+    const csvRows = [fields.join(",")];
+
+    for (const row of result.rows) {
+      const values = [
+        `"${row.title}"`,
+        row.amount,
+        row.type,
+        `"${row.category}"`,
+        `"${new Date(row.created_at).toISOString().split('T')[0]}"`
+      ];
+      csvRows.push(values.join(","));
+    }
+
+    const csvData = csvRows.join("\n");
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=ExpenseTracker_Data.csv");
+    res.status(200).send(csvData);
+
+  } catch (err) {
+    console.error("Export error:", err);
+    res.status(500).json({ success: false, message: "Export failed" });
+  }
+});
 
 module.exports = router;

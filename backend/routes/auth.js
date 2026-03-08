@@ -4,6 +4,25 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require("../db");
 const sendEmail = require("../utils/sendEmail");
+const { OAuth2Client } = require("google-auth-library");
+
+// Inline verifyToken since there doesn't seem to be a separate middleware/auth.js yet
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ success: false, message: "No token provided" });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // add user id to req.user exactly as the routes expect
+    next();
+  } catch (error) {
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
+};
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const router = express.Router();
 
@@ -53,6 +72,58 @@ router.post("/login", async (req, res) => {
     res.json({ success: true, token, name: user.name });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* ================= GOOGLE AUTH ================= */
+router.post("/google", async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    // Verify token with Google
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name;
+    const googleId = payload.sub; // Unique Google Identifier
+
+    // Check if user exists
+    let userRes = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
+
+    let user;
+
+    if (userRes.rows.length === 0) {
+      // Create new user with dummy password (since they use Google)
+      // Generate a highly secure random password so they can't login via email/pwd unless they reset it
+      const randomPassword = crypto.randomBytes(32).toString("hex");
+      const hashed = await bcrypt.hash(randomPassword, 10);
+
+      // We should ideally have a google_id column, but using email is fine for now
+      const insertRes = await pool.query(
+        "INSERT INTO users (name, email, password) VALUES ($1,$2,$3) RETURNING *",
+        [name, email, hashed]
+      );
+      user = insertRes.rows[0];
+    } else {
+      user = userRes.rows[0];
+    }
+
+    // Generate our own JWT token for the session
+    const jwtToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ success: true, token: jwtToken, name: user.name });
+
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    res.status(500).json({ success: false, message: "Google Authentication Failed" });
   }
 });
 
@@ -136,6 +207,39 @@ router.post("/reset-password", async (req, res) => {
   } catch (err) {
     console.error("Reset error:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* ================= RESET ACCOUNT DATA ================= */
+router.post("/reset-data", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    // Delete all user related data except the user record
+    await pool.query("DELETE FROM expenses WHERE user_id=$1", [userId]);
+    await pool.query("DELETE FROM investments WHERE user_id=$1", [userId]);
+    await pool.query("DELETE FROM saving_goals WHERE user_id=$1", [userId]);
+
+    res.json({ success: true, message: "Data wiped successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to wipe data" });
+  }
+});
+
+/* ================= DELETE ACCOUNT ================= */
+router.post("/delete-account", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    // Delete user (cascade should handle related records if set up, otherwise we delete them manually first)
+    await pool.query("DELETE FROM expenses WHERE user_id=$1", [userId]);
+    await pool.query("DELETE FROM investments WHERE user_id=$1", [userId]);
+    await pool.query("DELETE FROM saving_goals WHERE user_id=$1", [userId]);
+
+    // Finally delete user
+    await pool.query("DELETE FROM users WHERE id=$1", [userId]);
+
+    res.json({ success: true, message: "Account deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to delete account" });
   }
 });
 
