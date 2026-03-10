@@ -1,6 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+// LAYOUT
+import Layout from "./components/Layout/Layout";
+
+// ROUTE GUARDS
+import RequireAuth from "./auth/RequireAuth";
+import RequireGuest from "./auth/RequireGuest";
+
 // AUTH
 import Login from "./components/Login/Login";
 import Signup from "./components/Signup/Signup";
@@ -26,18 +33,26 @@ function App() {
       <BrowserRouter>
         <Routes>
 
-          {/* AUTH */}
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* AUTH (guest-only) */}
+          <Route element={<RequireGuest />}>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
+
+          {/* AUTH (public, for recovery) */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* MAIN */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/wallet" element={<Wallet />} />
+          {/* MAIN (auth-only) */}
+          <Route element={<RequireAuth />}>
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/wallet" element={<Wallet />} />
+            </Route>
+          </Route>
 
         </Routes>
       </BrowserRouter>

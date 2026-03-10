@@ -1,0 +1,18 @@
+[dotenv@17.2.4] injecting env (12) from .env -- tip: ???????  run anywhere with `dotenvx run -- yourcommand`
+Testing model: gemini-2.0-flash...
+node : ??? Error with gemini-2.0-flash: 
+[GoogleGenerativeAI Error]: Error fetching from https://gen
+erativelanguage.googleapis.com/v1beta/models/gemini-2.0-fla
+sh:generateContent: [429 Too Many Requests] You exceeded 
+your current quota, please check your plan and billing 
+details. For more information on this error, head to: 
+https://ai.google.dev/gemini-api/docs/rate-limits. To 
+monitor your current usage, head to: 
+https://ai.dev/rate-limit. 
+At line:1 char:1
++ node test-ai-2026.js > test_2026.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (??? Error wit 
+   h ...ev/rate-limit. :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

@@ -1,7 +1,7 @@
 .settings-page {
     min-height: 100vh;
-    background: #f8fafc;
-    color: #1e293b;
+    background: var(--bg-main);
+    color: var(--text-main);
     padding: 40px;
     font-family: 'Inter', sans-serif;
     max-width: 1200px;
@@ -48,7 +48,7 @@
     font-size: 32px;
     font-weight: 800;
     margin: 0 0 8px 0;
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .page-header p {
@@ -62,10 +62,10 @@
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 30px;
-    background: white;
+    background: var(--bg-card);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    border: 1px solid #f1f5f9;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
     min-height: 600px;
     overflow: hidden;
 }
@@ -78,9 +78,9 @@
 
 /* SIDEBAR */
 .settings-sidebar {
-    background: #f8fafc;
+    background: var(--bg-main);
     padding: 30px 20px;
-    border-right: 1px solid #e2e8f0;
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -108,8 +108,8 @@
 }
 
 .tab-btn:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: var(--bg-main);
+    color: var(--text-main);
 }
 
 .tab-btn.active {
@@ -125,7 +125,7 @@
 
 .tab-pane h2 {
     font-size: 24px;
-    color: #0f172a;
+    color: var(--text-main);
     margin: 0 0 8px 0;
 }
 
@@ -134,7 +134,7 @@
     font-size: 15px;
     margin: 0 0 30px 0;
     padding-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 /* FORMS */
@@ -166,10 +166,10 @@
 .input-group select {
     padding: 14px;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-color);
     font-size: 15px;
-    color: #0f172a;
-    background: #f8fafc;
+    color: var(--text-main);
+    background: var(--input-bg);
     outline: none;
     transition: all 0.2s;
 }
@@ -182,9 +182,9 @@
 
 .input-group input:focus:not(:disabled),
 .input-group select:focus {
-    border-color: #3b82f6;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--primary);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .helper-text {
@@ -195,10 +195,10 @@
 
 /* SECURITY SECTION */
 .security-section {
-    background: #f8fafc;
+    background: var(--bg-main);
     padding: 20px;
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
 }
 
 .security-section h3 {
@@ -242,7 +242,7 @@
     display: flex;
     justify-content: flex-end;
     padding-top: 20px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
 }
 
 /* DATA MANAGEMENT */
@@ -251,7 +251,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .data-row h4 {
@@ -267,8 +267,8 @@
 .danger-zone {
     margin-top: 40px;
     padding: 25px;
-    background: #fff1f2;
-    border: 1px solid #fecdd3;
+    background: rgba(225, 29, 72, 0.05);
+    border: 1px solid rgba(225, 29, 72, 0.2);
     border-radius: 12px;
 }
 
@@ -331,48 +331,12 @@
 }
 
 /* NOTIFICATIONS & PREFERENCES */
-.theme-options {
-    display: flex;
-    gap: 20px;
-}
-
-.theme-card {
-    flex: 1;
-    padding: 20px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.theme-card.active {
-    border-color: #3b82f6;
-    background: #eff6ff;
-}
-
-.theme-card.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    position: relative;
-}
-
-.badge {
-    background: #e2e8f0;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    color: #475569;
-}
-
 .toggle-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     margin-bottom: 15px;
     cursor: pointer;
@@ -380,7 +344,7 @@
 
 .toggle-text h4 {
     margin: 0 0 5px 0;
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .toggle-text p {

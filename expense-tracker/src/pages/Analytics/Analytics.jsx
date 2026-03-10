@@ -67,54 +67,32 @@ const Analytics = () => {
     ]);
 
     // Process Area Data (Live Time Series)
-    // Group by Date for 'month'/'all', Group by Month for 'year'
     const grouped = {};
-
-    // Sort oldest to newest for the area chart
     const sorted = [...filteredTransactions].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
     sorted.forEach(t => {
       const d = new Date(t.created_at);
       let key = "";
-
       if (period === "year") {
         key = d.toLocaleString('default', { month: 'short' });
       } else {
         key = `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
       }
-
       if (!grouped[key]) grouped[key] = { name: key, income: 0, expense: 0 };
-
       if (t.type === "income") grouped[key].income += Number(t.amount);
       if (t.type === "expense") grouped[key].expense += Number(t.amount);
     });
 
     setAreaData(Object.values(grouped));
-
   }, [transactions, period]);
 
-  const COLORS = ["#00C49F", "#FF8042"];
+  const COLORS = ["#10b981", "#ef4444"];
 
   return (
-    <div className="analytics-page fade-in">
-
-      {/* Top Header */}
-      <div className="top-header">
-        <button onClick={() => navigate("/dashboard")} className="back-btn">
-          ← Back to Dashboard
-        </button>
-        <div className="live-clock">
-          <div className="pulse-dot"></div>
-          <div>
-            <strong>{currentTime.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
-            <span>{currentTime.toLocaleTimeString()}</span>
-          </div>
-        </div>
-      </div>
-
+    <div className="analytics-page">
       <div className="header-section">
-        <h1>Financial Analytics Hub</h1>
-        <p>Real-time insights into your financial flow.</p>
+        <h1>Financial Analytics</h1>
+        <p>Insights into your financial activities.</p>
 
         <div className="period-filters">
           <button className={period === "month" ? "active" : ""} onClick={() => setPeriod("month")}>This Month</button>
@@ -123,14 +101,10 @@ const Analytics = () => {
         </div>
       </div>
 
-
-      {/* Charts Grid */}
       <div className="charts-grid">
-
-        {/* Live Trend Area Chart */}
         <div className="chart-card wide">
-          <h3>Income & Expense Trends</h3>
-          <p className="subtitle">Visualizing your cash flow over time</p>
+          <h3>Cash Flow Trends</h3>
+          <p className="subtitle">Visualizing trends over time</p>
 
           <div className="chart-wrapper">
             {areaData.length > 0 ? (
@@ -138,12 +112,12 @@ const Analytics = () => {
                 <AreaChart data={areaData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00C49F" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#00C49F" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FF8042" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#FF8042" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -153,8 +127,8 @@ const Analytics = () => {
                     contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                   />
                   <AreaLegend />
-                  <Area type="monotone" dataKey="income" stroke="#00C49F" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
-                  <Area type="monotone" dataKey="expense" stroke="#FF8042" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" />
+                  <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
+                  <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
@@ -163,10 +137,9 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Ratio Pie Chart */}
         <div className="chart-card">
           <h3>Distribution Ratio</h3>
-          <p className="subtitle">Breakdown of total cash flow</p>
+          <p className="subtitle">Income vs Expense ratio</p>
 
           <div className="chart-wrapper flex-center">
             {pieData[0]?.value > 0 || pieData[1]?.value > 0 ? (
@@ -177,8 +150,8 @@ const Analytics = () => {
                     dataKey="value"
                     nameKey="name"
                     innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={5}
+                    outerRadius={100}
+                    paddingAngle={8}
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={index} fill={COLORS[index]} />
@@ -186,7 +159,7 @@ const Analytics = () => {
                   </Pie>
                   <PieTooltip
                     formatter={(value) => `Rs ${value}`}
-                    contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                   />
                   <PieLegend verticalAlign="bottom" height={36} />
                 </PieChart>
@@ -196,9 +169,7 @@ const Analytics = () => {
             )}
           </div>
         </div>
-
       </div>
-
     </div>
   );
 };

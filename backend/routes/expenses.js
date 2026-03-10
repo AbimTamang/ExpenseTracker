@@ -2,32 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const pool = require("../db");
-const jwt = require("jsonwebtoken");
-
-
-
-/* ======================
-   VERIFY TOKEN FUNCTION
-====================== */
-
-const verifyToken = (req) => {
-
-  const authHeader =
-    req.headers.authorization;
-
-  const token =
-    authHeader.split(" ")[1];
-
-  const decoded =
-    jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-  return decoded.id;
-
-};
-
+const requireAuth = require("../middleware/requireAuth");
 
 
 
@@ -35,31 +10,29 @@ const verifyToken = (req) => {
    ADD TRANSACTION
 ====================== */
 
-router.post("/add", async (req, res) => {
+router.post("/add", requireAuth, async (req, res) => {
 
   try {
 
-    const userId =
-      verifyToken(req);
+    const userId = req.userId;
 
     const {
       title,
       amount,
       type,
-      category
+      category,
+      date
     } = req.body;
 
+    const query = date
+      ? `INSERT INTO expenses (user_id, title, amount, type, category, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
+      : `INSERT INTO expenses (user_id, title, amount, type, category) VALUES ($1, $2, $3, $4, $5)`;
 
+    const params = date
+      ? [userId, title, amount, type, category, date]
+      : [userId, title, amount, type, category];
 
-    await pool.query(
-
-      `INSERT INTO expenses
-       (user_id,title,amount,type,category)
-       VALUES ($1,$2,$3,$4,$5)`,
-
-      [userId, title, amount, type, category]
-
-    );
+    await pool.query(query, params);
 
 
     res.json({
@@ -86,12 +59,11 @@ router.post("/add", async (req, res) => {
    GET ALL TRANSACTIONS
 ====================== */
 
-router.get("/list", async (req, res) => {
+router.get("/list", requireAuth, async (req, res) => {
 
   try {
 
-    const userId =
-      verifyToken(req);
+    const userId = req.userId;
 
 
     const result =
@@ -135,12 +107,11 @@ router.get("/list", async (req, res) => {
    SUMMARY
 ====================== */
 
-router.get("/summary", async (req, res) => {
+router.get("/summary", requireAuth, async (req, res) => {
 
   try {
 
-    const userId =
-      verifyToken(req);
+    const userId = req.userId;
 
 
 
@@ -217,12 +188,11 @@ router.get("/summary", async (req, res) => {
    DELETE
 ====================== */
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", requireAuth, async (req, res) => {
 
   try {
 
-    const userId =
-      verifyToken(req);
+    const userId = req.userId;
 
     const id =
       req.params.id;
@@ -256,9 +226,9 @@ router.delete("/delete/:id", async (req, res) => {
    EXPORT TO CSV
 ====================== */
 
-router.get("/export", async (req, res) => {
+router.get("/export", requireAuth, async (req, res) => {
   try {
-    const userId = verifyToken(req);
+    const userId = req.userId;
 
     const result = await pool.query(
       `SELECT title, amount, type, category, created_at 

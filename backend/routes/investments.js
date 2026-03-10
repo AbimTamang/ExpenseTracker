@@ -1,19 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-const jwt = require("jsonwebtoken");
-
-const verifyToken = (req) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) throw new Error("No token");
-    const token = authHeader.split(" ")[1];
-    return jwt.verify(token, process.env.JWT_SECRET).id;
-};
+const requireAuth = require("../middleware/requireAuth");
 
 // Add investment
-router.post("/add", async (req, res) => {
+router.post("/add", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const { title, amount, category } = req.body;
         await pool.query(
             `INSERT INTO investments (user_id, title, amount, category) VALUES ($1, $2, $3, $4)`,
@@ -27,9 +20,9 @@ router.post("/add", async (req, res) => {
 });
 
 // Get investments
-router.get("/list", async (req, res) => {
+router.get("/list", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const result = await pool.query(
             `SELECT * FROM investments WHERE user_id=$1 ORDER BY created_at DESC`,
             [userId]
@@ -42,9 +35,9 @@ router.get("/list", async (req, res) => {
 });
 
 // Delete investment
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const id = req.params.id;
         await pool.query(`DELETE FROM investments WHERE id=$1 AND user_id=$2`, [id, userId]);
         res.json({ success: true });

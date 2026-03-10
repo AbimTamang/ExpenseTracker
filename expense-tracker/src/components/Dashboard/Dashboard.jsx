@@ -7,14 +7,24 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Cell
 } from "recharts";
+import {
+  FiPlus,
+  FiArrowUpRight,
+  FiArrowDownLeft,
+  FiTrash2,
+  FiCreditCard,
+  FiSearch,
+  FiCalendar,
+  FiZap,
+  FiCpu
+} from "react-icons/fi";
 import "./Dashboard.css";
 
 const Dashboard = () => {
-
   const navigate = useNavigate();
-  const name = localStorage.getItem("name");
+  const name = localStorage.getItem("name") || "User";
   const token = localStorage.getItem("token");
 
   const [summary, setSummary] = useState({
@@ -25,45 +35,73 @@ const Dashboard = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const toLocalDateString = (dateInput) => {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [lookupDate, setLookupDate] = useState(() => toLocalDateString(new Date()));
+  const [lookupResults, setLookupResults] = useState({ total: 0, items: [] });
+  const [aiInsights, setAiInsights] = useState([]);
+  const [loadingAI, setLoadingAI] = useState(false);
 
   // FETCH SUMMARY
   const fetchSummary = async () => {
-    const res = await fetch(
-      "http://localhost:5000/api/expenses/summary",
-      {
+    try {
+      const res = await fetch("http://localhost:5000/api/expenses/summary", {
         headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-
-    const data = await res.json();
-    if (data.success) setSummary(data.summary);
+      });
+      const data = await res.json();
+      if (data.success) setSummary(data.summary);
+    } catch (err) {
+      console.error("Error fetching summary:", err);
+    }
   };
 
   // FETCH TRANSACTIONS
   const fetchTransactions = async () => {
-    const res = await fetch(
-      "http://localhost:5000/api/expenses/list",
-      {
+    try {
+      const res = await fetch("http://localhost:5000/api/expenses/list", {
         headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTransactions(data.transactions);
+        prepareChart(data.transactions);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      setTransactions(data.transactions);
-      prepareChart(data.transactions);
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  // MONTHLY CHART
+  const fetchAIInsights = async () => {
+    setLoadingAI(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/ai/insights", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAiInsights(data.insights);
+      } else {
+        setAiInsights([data.message || "Unable to load insights right now. Please check back later!"]);
+        if (data.message && data.message.includes("API_KEY")) {
+          setAiInsights(["Enable AI by adding your Gemini API key!"]);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
   const prepareChart = (data) => {
-
-    const months = [
-      "Jan","Feb","Mar","Apr","May","Jun",
-      "Jul","Aug","Sep","Oct","Nov","Dec"
-    ];
-
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let result = months.map(month => ({
       month,
       income: 0,
@@ -71,206 +109,319 @@ const Dashboard = () => {
     }));
 
     data.forEach(item => {
-
       const date = new Date(item.created_at);
       const monthIndex = date.getMonth();
-
       if (item.type === "income") {
         result[monthIndex].income += Number(item.amount);
       } else {
         result[monthIndex].expense += Number(item.amount);
       }
-
     });
 
     setChartData(result);
   };
 
-  // 🔥 DAILY CALCULATION (NEW FEATURE ONLY)
   const getTodaySummary = () => {
-
-    const today = new Date().toISOString().split("T")[0];
-
+    const today = toLocalDateString(new Date());
     let income = 0;
     let expense = 0;
 
     transactions.forEach(item => {
-
-      const itemDate = new Date(item.created_at)
-        .toISOString()
-        .split("T")[0];
-
+      const itemDate = toLocalDateString(item.created_at);
       if (itemDate === today) {
-
-        if (item.type === "income") {
-          income += Number(item.amount);
-        } else {
-          expense += Number(item.amount);
-        }
-
+        if (item.type === "income") income += Number(item.amount);
+        else expense += Number(item.amount);
       }
-
     });
 
-    return {
-      income,
-      expense,
-      balance: income - expense
-    };
+    return { income, expense, balance: income - expense };
   };
 
   useEffect(() => {
-
     if (!token) {
       navigate("/");
       return;
     }
-
     fetchSummary();
     fetchTransactions();
-
+    fetchAIInsights();
   }, []);
 
-  // DELETE
-  const deleteTransaction = async (id) => {
+  useEffect(() => {
+    const expensesOnDate = transactions.filter(t => {
+      const tDate = toLocalDateString(t.created_at);
+      return tDate === lookupDate && t.type === 'expense';
+    });
 
-    await fetch(
-      `http://localhost:5000/api/expenses/delete/${id}`,
-      {
+    const total = expensesOnDate.reduce((sum, item) => sum + Number(item.amount), 0);
+    setLookupResults({ total, items: expensesOnDate });
+  }, [lookupDate, transactions]);
+
+  const deleteTransaction = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this transaction?")) return;
+    try {
+      await fetch(`http://localhost:5000/api/expenses/delete/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-
-    fetchSummary();
-    fetchTransactions();
-  };
-
-  // LOGOUT
-  const logout = () => {
-    localStorage.clear();
-    navigate("/");
+      });
+      fetchSummary();
+      fetchTransactions();
+    } catch (err) {
+      console.error("Error deleting transaction:", err);
+    }
   };
 
   const todayData = getTodaySummary();
 
   return (
-    <div className="dashboard">
-
-      {/* SIDEBAR */}
-      <div className="sidebar">
-
-        <div>
-          <h2>ExpenseTracker</h2>
-
-          <p onClick={() => navigate("/dashboard")}>Dashboard</p>
-          <p onClick={() => navigate("/transactions")}>Transactions</p>
-          <p onClick={() => navigate("/analytics")}>Analytics</p>
-          <p onClick={() => navigate("/wallet")}>Wallet</p>
-          <p onClick={() => navigate("/settings")}>Settings</p>
+    <div className="dashboard-content">
+      <header className="header">
+        <div className="greeting">
+          <h1>Hello, {name} 👋</h1>
+          <p>Welcome back to your financial dashboard.</p>
         </div>
-
-        <button className="logout-btn" onClick={logout}>
-          Logout
+        <button className="add-btn" onClick={() => navigate("/transactions")}>
+          <FiPlus />
+          <span>New Transaction</span>
         </button>
+      </header>
 
-      </div>
-
-      {/* MAIN */}
-      <div className="main">
-
-        {/* HEADER */}
-        <div className="header">
-          <h1>Hello, {name}</h1>
-          <button
-            className="add-btn"
-            onClick={() => navigate("/transactions")}
-          >
-            + Add Transaction
-          </button>
-        </div>
-
-        {/* 🔥 TODAY CARDS (SAME UI STYLE AS YOUR CARDS) */}
-        <div className="cards">
-
-          <div className="card income">
-            <h3>Today's Income</h3>
-            <p>Rs {todayData.income}</p>
-          </div>
-
-          <div className="card expense">
-            <h3>Today's Expense</h3>
-            <p>Rs {todayData.expense}</p>
-          </div>
-
-          <div className="card balance">
-            <h3>Today's Balance</h3>
-            <p>Rs {todayData.balance}</p>
-          </div>
-
-        </div>
-
-        {/* ORIGINAL TOTAL CARDS */}
-        <div className="cards">
-
-          <div className="card income">
-            <h3>Income</h3>
-            <p>Rs {summary.income}</p>
-          </div>
-
-          <div className="card expense">
-            <h3>Expense</h3>
-            <p>Rs {summary.expense}</p>
-          </div>
-
-          <div className="card balance">
-            <h3>Balance</h3>
-            <p>Rs {summary.balance}</p>
-          </div>
-
-        </div>
-
-        {/* CHART */}
-        <div className="chart">
-          <h3>Monthly Overview</h3>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="income" fill="#00c896" />
-              <Bar dataKey="expense" fill="#ff4d4d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* RECENT */}
-        <div className="recent">
-          <h3>Recent Transactions</h3>
-
-          {transactions.slice(0,5).map(item => (
-            <div key={item._id} className="transaction">
-
-              <span>{item.title}</span>
-
-              <span>Rs {item.amount}</span>
-
-              <button
-                onClick={() => deleteTransaction(item._id)}
-              >
-                Delete
-              </button>
-
+      <section className="dashboard-grid">
+        <div className="summary-section">
+          <h2 className="section-title">Snapshot</h2>
+          <div className="cards-grid">
+            <div className="card balance">
+              <div className="card-header">
+                <span className="card-label">Total Balance</span>
+                <div className="card-icon"><FiCreditCard /></div>
+              </div>
+              <div className="card-value">Rs {summary.balance.toLocaleString()}</div>
+              <div className="card-footer positive">
+                <FiArrowUpRight /> <span>+2.5% from last month</span>
+              </div>
             </div>
-          ))}
 
+            <div className="card income">
+              <div className="card-header">
+                <span className="card-label">Overall Income</span>
+                <div className="card-icon"><FiArrowUpRight /></div>
+              </div>
+              <div className="card-value">Rs {summary.income.toLocaleString()}</div>
+            </div>
+
+            <div className="card expense">
+              <div className="card-header">
+                <span className="card-label">Overall Expense</span>
+                <div className="card-icon"><FiArrowDownLeft /></div>
+              </div>
+              <div className="card-value">Rs {summary.expense.toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div className="lookup-card">
+            <div className="lookup-header">
+              <div className="lookup-title">
+                <FiSearch />
+                <h3>Historical Spent Tracker</h3>
+              </div>
+              <div className="lookup-input-wrapper">
+                <FiCalendar />
+                <input
+                  type="date"
+                  value={lookupDate}
+                  onChange={(e) => setLookupDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="lookup-body">
+              <div className="lookup-summary">
+                <span className="lookup-stat-label">
+                  Total Spent on {(() => {
+                    const [y, m, d] = lookupDate.split('-').map(Number);
+                    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                  })()}
+                </span>
+                <span className="lookup-stat-value">Rs {lookupResults.total.toLocaleString()}</span>
+              </div>
+
+              <div className="lookup-items">
+                {lookupResults.items.length > 0 ? (
+                  lookupResults.items.map(item => (
+                    <div key={item._id} className="lookup-item">
+                      <span className="item-name">{item.title}</span>
+                      <span className="item-price">Rs {Number(item.amount).toLocaleString()}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-lookup-data">No expenses on this date.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="today-box">
+            <div className="today-header">
+              <h3>Today's Activities</h3>
+              <span className="today-date">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+            </div>
+            <div className="today-stats">
+              <div className="stat-item">
+                <span className="stat-label">Income</span>
+                <span className="stat-value plus">+Rs {todayData.income}</span>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <span className="stat-label">Spent</span>
+                <span className="stat-value minus">-Rs {todayData.expense}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-      </div>
+        <div className="content-secondary">
+          <div className="ai-advisor-card">
+            <div className="ai-header">
+              <div className="ai-title">
+                <div className="ai-brain-icon">
+                  <FiCpu />
+                </div>
+                <div>
+                  <h3>AI Spending Advisor</h3>
+                  <p className="ai-subtitle">Smart financial insights</p>
+                </div>
+              </div>
+              <FiZap className="ai-zap-icon" />
+            </div>
+            <div className="ai-body">
+              {loadingAI ? (
+                <div className="ai-loading">
+                  <div className="pulse-dot"></div>
+                  <span>Analyzing your habits...</span>
+                </div>
+              ) : (
+                <div className="insight-bubbles">
+                  {aiInsights.length > 0 ? (
+                    aiInsights.map((insight, idx) => (
+                      <div key={idx} className="insight-bubble slide-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                        {insight}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="ai-empty">Add more transactions for AI tips!</p>
+                  )}
+                </div>
+              )}
+            </div>
+            <button className="ai-refresh-btn" onClick={fetchAIInsights} disabled={loadingAI}>
+              {loadingAI ? "Consulting..." : "Refresh Advice"}
+            </button>
+          </div>
 
-    </div>
+          <div className="chart-container">
+            <h2 className="section-title">Monthly Analytics</h2>
+            <div className="chart-wrapper">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: '#f1f5f9' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  />
+                  <Bar dataKey="income" radius={[4, 4, 0, 0]} barSize={20}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-income-${index}`} fill="#6366f1" />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="expense" radius={[4, 4, 0, 0]} barSize={20}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-expense-${index}`} fill="#ef4444" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="daily-insights-section">
+            <h2 className="section-title">Daily Spending Insights</h2>
+            <div className="insights-card">
+              {transactions.filter(t => t.type === 'expense').length > 0 ? (
+                transactions
+                  .filter(t => t.type === 'expense')
+                  .slice(0, 3)
+                  .map(item => {
+                    const dateObj = new Date(item.created_at);
+                    const dayName = dateObj.toLocaleDateString(undefined, { weekday: 'long' });
+                    const fullDate = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+                    return (
+                      <div key={item._id} className="insight-item">
+                        <div className="insight-day-box">
+                          <span className="day-name">{dayName}</span>
+                          <span className="full-date">{fullDate}</span>
+                        </div>
+                        <div className="insight-divider"></div>
+                        <div className="insight-details">
+                          <span className="spent-on">Spent Rs {item.amount.toLocaleString()} on <strong>{item.title}</strong></span>
+                          <span className="category-tag">{item.category || 'General'}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+              ) : (
+                <p className="no-data">No expense data to analyze.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="recent-section">
+            <div className="recent-header">
+              <h2 className="section-title">All Activities</h2>
+              <button className="view-all" onClick={() => navigate("/transactions")}>View All</button>
+            </div>
+            <div className="transaction-list">
+              {transactions.length > 0 ? (
+                transactions.slice(0, 5).map(item => (
+                  <div key={item._id} className="transaction-item">
+                    <div className={`transaction-icon-box ${item.type}`}>
+                      {item.type === 'income' ? <FiArrowUpRight /> : <FiArrowDownLeft />}
+                    </div>
+                    <div className="transaction-info">
+                      <span className="transaction-title">{item.title}</span>
+                      <span className="transaction-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="transaction-amount-group">
+                      <span className={`transaction-amount ${item.type}`}>
+                        {item.type === 'income' ? '+' : '-'} Rs {item.amount}
+                      </span>
+                      <button
+                        className="delete-btn-ghost"
+                        onClick={() => deleteTransaction(item._id)}
+                        title="Delete"
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="no-data">No transactions yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section >
+    </div >
   );
 };
 

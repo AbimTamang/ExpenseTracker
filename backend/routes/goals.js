@@ -1,19 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-const jwt = require("jsonwebtoken");
-
-const verifyToken = (req) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) throw new Error("No token");
-    const token = authHeader.split(" ")[1];
-    return jwt.verify(token, process.env.JWT_SECRET).id;
-};
+const requireAuth = require("../middleware/requireAuth");
 
 // Add Goal
-router.post("/add", async (req, res) => {
+router.post("/add", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const { title, target_amount, deadline } = req.body;
         await pool.query(
             `INSERT INTO saving_goals (user_id, title, target_amount, current_amount, deadline) VALUES ($1, $2, $3, 0, $4)`,
@@ -27,9 +20,9 @@ router.post("/add", async (req, res) => {
 });
 
 // Update Goal contribution
-router.post("/add-funds/:id", async (req, res) => {
+router.post("/add-funds/:id", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const { amount } = req.body;
         const { id } = req.params;
         await pool.query(
@@ -44,9 +37,9 @@ router.post("/add-funds/:id", async (req, res) => {
 });
 
 // Get Goals
-router.get("/list", async (req, res) => {
+router.get("/list", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const result = await pool.query(
             `SELECT * FROM saving_goals WHERE user_id=$1 ORDER BY created_at DESC`,
             [userId]
@@ -59,9 +52,9 @@ router.get("/list", async (req, res) => {
 });
 
 // Delete Goal
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", requireAuth, async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        const userId = req.userId;
         const id = req.params.id;
         await pool.query(`DELETE FROM saving_goals WHERE id=$1 AND user_id=$2`, [id, userId]);
         res.json({ success: true });

@@ -193,18 +193,6 @@ const Settings = () => {
                   </select>
                   <p className="helper-text">This symbol will be shown across your dashboard and transactions.</p>
                 </div>
-
-                <div className="input-group">
-                  <label>Appearance</label>
-                  <div className="theme-options">
-                    <label className="theme-card active">
-                      <input type="radio" name="theme" checked readOnly /> Light Mode
-                    </label>
-                    <label className="theme-card disabled">
-                      <input type="radio" name="theme" disabled /> Dark Mode <span className="badge">Coming Soon</span>
-                    </label>
-                  </div>
-                </div>
               </div>
             </div>
           )}
