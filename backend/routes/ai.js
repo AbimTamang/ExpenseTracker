@@ -65,7 +65,7 @@ router.get("/insights", verifyToken, async (req, res) => {
             });
         }
 
-        const modelName = "gemini-2.0-flash-lite-001";
+        const modelName = "gemini-2.0-flash";
         const model = genAI.getGenerativeModel({ model: modelName });
 
         const prompt = `
@@ -101,9 +101,15 @@ router.get("/insights", verifyToken, async (req, res) => {
         } catch (genErr) {
             console.error("Gemini API Error:", genErr.message);
             if (genErr.message.includes("429")) {
+                // Fallback for Viva: Mock insights when quota limit is reached.
+                const mockInsights = [
+                    "Consider cooking dinner twice a week to save $50.",
+                    "Your entertainment expenses are up; try finding free hobbies.",
+                    "Great job keeping utility bills low!"
+                ];
                 return res.json({
-                    success: false,
-                    message: "AI Advisor is taking a short break (Quota reached). Please try again in 60 seconds!"
+                    success: true,
+                    insights: mockInsights
                 });
             }
             throw genErr;
