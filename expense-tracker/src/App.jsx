@@ -24,6 +24,7 @@ import Transactions from "./components/Transactions/Transactions";
 import Analytics from "./pages/Analytics/Analytics";
 import Settings from "./pages/Setting/Settings";
 import Wallet from "./pages/Wallet/Wallet";
+import Budgets from "./pages/Budgets/Budgets";
 
 function App() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
@@ -51,6 +52,7 @@ function App() {
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/wallet" element={<Wallet />} />
+              <Route path="/budgets" element={<Budgets />} />
             </Route>
           </Route>
 

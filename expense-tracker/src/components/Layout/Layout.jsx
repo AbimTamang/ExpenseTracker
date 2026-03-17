@@ -9,7 +9,8 @@ import {
     FiSettings,
     FiLogOut,
     FiSun,
-    FiMoon
+    FiMoon,
+    FiTarget
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import "./Layout.css";
@@ -38,6 +39,7 @@ const Layout = () => {
         { label: "Transactions", icon: <FiDollarSign />, path: "/transactions" },
         { label: "Analytics", icon: <FiPieChart />, path: "/analytics" },
         { label: "Wallet", icon: <FiCreditCard />, path: "/wallet" },
+        { label: "Budgets", icon: <FiTarget />, path: "/budgets" },
         { label: "Settings", icon: <FiSettings />, path: "/settings" }
     ];
 

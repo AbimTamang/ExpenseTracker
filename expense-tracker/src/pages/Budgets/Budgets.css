@@ -1,0 +1,232 @@
+.budgets-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.budgets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.budgets-header h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.budgets-header p {
+    color: #64748b;
+}
+
+.add-budget-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #6366f1;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.add-budget-btn:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+}
+
+/* FORM CARD */
+.budget-form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 3rem;
+    border: 1px solid #f1f5f9;
+}
+
+.form-row {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #475569;
+}
+
+.form-group select, .form-group input {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border 0.3s ease;
+}
+
+.form-group select:focus, .form-group input:focus {
+    border-color: #6366f1;
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.save-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #10b981;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.cancel-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* GRID */
+.budgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.budget-progress-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: transform 0.3s ease;
+}
+
+.budget-progress-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+}
+
+.budget-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.budget-cat-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.cat-icon {
+    background: #f1f5f9;
+    padding: 0.5rem;
+    border-radius: 10px;
+    color: #6366f1;
+    display: flex;
+}
+
+.edit-mini-btn {
+    color: #94a3b8;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.edit-mini-btn:hover {
+    background: #f8fafc;
+    color: #6366f1;
+}
+
+.budget-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.status-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-label.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.spent-text {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.progress-bar-container {
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.budget-remaining {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.rem-text { color: #22c55e; }
+.rem-text-danger { color: #ef4444; }
+
+.empty-budgets {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.empty-budgets svg {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}

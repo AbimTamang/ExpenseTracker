@@ -8,6 +8,7 @@ const expenseRoutes = require("./routes/expenses");
 const investmentRoutes = require("./routes/investments");
 const goalRoutes = require("./routes/goals");
 const aiRoutes = require("./routes/ai");
+const budgetRoutes = require("./routes/budgets");
 
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/investments", investmentRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/budgets", budgetRoutes);
 
 
 

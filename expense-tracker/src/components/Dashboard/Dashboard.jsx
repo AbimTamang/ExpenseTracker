@@ -18,7 +18,8 @@ import {
   FiSearch,
   FiCalendar,
   FiZap,
-  FiCpu
+  FiCpu,
+  FiTarget
 } from "react-icons/fi";
 import "./Dashboard.css";
 
@@ -35,6 +36,9 @@ const Dashboard = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [budgetStats, setBudgetStats] = useState([]);
+  const [filterCategory, setFilterCategory] = useState("All");
+
   const toLocalDateString = (dateInput) => {
     if (!dateInput) return "";
     const date = new Date(dateInput);
@@ -46,8 +50,8 @@ const Dashboard = () => {
 
   const [lookupDate, setLookupDate] = useState(() => toLocalDateString(new Date()));
   const [lookupResults, setLookupResults] = useState({ total: 0, items: [] });
-  const [aiInsights, setAiInsights] = useState([]);
-  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiForecast, setAiForecast] = useState(null);
+  const [loadingForecast, setLoadingForecast] = useState(false);
 
   // FETCH SUMMARY
   const fetchSummary = async () => {
@@ -78,25 +82,36 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAIInsights = async () => {
-    setLoadingAI(true);
+
+  const fetchAIForecast = async () => {
+    setLoadingForecast(true);
     try {
-      const res = await fetch("http://localhost:5000/api/ai/insights", {
+      const res = await fetch("http://localhost:5000/api/ai/predictions", {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success) {
-        setAiInsights(data.insights);
+        setAiForecast(data.forecast);
       } else {
-        setAiInsights([data.message || "Unable to load insights right now. Please check back later!"]);
-        if (data.message && data.message.includes("API_KEY")) {
-          setAiInsights(["Enable AI by adding your Gemini API key!"]);
-        }
+        setAiForecast(data.message || "Forecast currently unavailable.");
       }
     } catch (err) {
-      console.log(err);
+      console.log("Forecast error:", err);
+      setAiForecast("Server connection error.");
     } finally {
-      setLoadingAI(false);
+      setLoadingForecast(false);
+    }
+  };
+
+  const fetchBudgetStats = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/budgets/stats", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) setBudgetStats(data.stats);
+    } catch (err) {
+      console.error("Error fetching budget stats:", err);
     }
   };
 
@@ -108,7 +123,13 @@ const Dashboard = () => {
       expense: 0
     }));
 
-    data.forEach(item => {
+    // Start with the raw transaction list then filter by category if needed
+    let filteredData = data;
+    if (filterCategory !== "All") {
+      filteredData = data.filter(item => item.category === filterCategory);
+    }
+
+    filteredData.forEach(item => {
       const date = new Date(item.created_at);
       const monthIndex = date.getMonth();
       if (item.type === "income") {
@@ -144,8 +165,13 @@ const Dashboard = () => {
     }
     fetchSummary();
     fetchTransactions();
-    fetchAIInsights();
+    fetchAIForecast();
+    fetchBudgetStats();
   }, []);
+
+  useEffect(() => {
+    prepareChart(transactions);
+  }, [transactions, filterCategory]);
 
   useEffect(() => {
     const expensesOnDate = transactions.filter(t => {
@@ -259,6 +285,69 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Moved All Activities here - original place of Today's activities */}
+          <div className="recent-section">
+            <div className="recent-header">
+              <h2 className="section-title">All Activities</h2>
+              <button className="view-all" onClick={() => navigate("/transactions")}>View All</button>
+            </div>
+            <div className="transaction-list">
+              {transactions.length > 0 ? (
+                transactions.slice(0, 8).map(item => (
+                  <div key={item._id} className="transaction-item">
+                    <div className={`transaction-icon-box ${item.type}`}>
+                      {item.type === 'income' ? <FiArrowUpRight /> : <FiArrowDownLeft />}
+                    </div>
+                    <div className="transaction-info">
+                      <span className="transaction-title">{item.title}</span>
+                      <span className="transaction-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="transaction-amount-group">
+                      <span className={`transaction-amount ${item.type}`}>
+                        {item.type === 'income' ? '+' : '-'} Rs {item.amount}
+                      </span>
+                      <button
+                        className="delete-btn-ghost"
+                        onClick={() => deleteTransaction(item._id)}
+                        title="Delete"
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="no-data">No transactions yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="content-secondary">
+          <div className="ai-forecast-card">
+            <div className="forecast-header">
+              <FiZap className="forecast-icon" />
+              <h3>AI Spending Forecast</h3>
+            </div>
+            {loadingForecast ? (
+              <div className="forecast-loading">Predicting next week...</div>
+            ) : aiForecast && typeof aiForecast === 'object' ? (
+              <div className="forecast-content">
+                <div className="forecast-stat">
+                  <span className="forecast-label">Estimated Next Week</span>
+                  <span className="forecast-value">Rs {aiForecast.estimatedNextWeek}</span>
+                </div>
+                <div className="forecast-stat">
+                  <span className="forecast-label">High Risk Category</span>
+                  <span className="forecast-value risk">{aiForecast.riskCategory}</span>
+                </div>
+                <p className="forecast-warning">{aiForecast.warning}</p>
+              </div>
+            ) : (
+              <p className="forecast-msg">{aiForecast || "Add more data for predictions."}</p>
+            )}
+          </div>
+
           <div className="today-box">
             <div className="today-header">
               <h3>Today's Activities</h3>
@@ -276,49 +365,63 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="content-secondary">
-          <div className="ai-advisor-card">
-            <div className="ai-header">
-              <div className="ai-title">
-                <div className="ai-brain-icon">
-                  <FiCpu />
-                </div>
-                <div>
-                  <h3>AI Spending Advisor</h3>
-                  <p className="ai-subtitle">Smart financial insights</p>
-                </div>
+          <div className="budget-watch-card">
+            <div className="budget-watch-header">
+              <div className="budget-watch-title">
+                <FiTarget className="target-icon" />
+                <h3>Daily Budget Watch</h3>
               </div>
-              <FiZap className="ai-zap-icon" />
+              <button className="manage-link" onClick={() => navigate("/budgets")}>Manage</button>
             </div>
-            <div className="ai-body">
-              {loadingAI ? (
-                <div className="ai-loading">
-                  <div className="pulse-dot"></div>
-                  <span>Analyzing your habits...</span>
-                </div>
-              ) : (
-                <div className="insight-bubbles">
-                  {aiInsights.length > 0 ? (
-                    aiInsights.map((insight, idx) => (
-                      <div key={idx} className="insight-bubble slide-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-                        {insight}
+            <div className="budget-watch-body">
+              {budgetStats.length > 0 ? (
+                budgetStats.slice(0, 3).map((item, idx) => {
+                  const percent = Math.min((item.current_spent / item.budget_limit) * 100, 100);
+                  return (
+                    <div key={idx} className="mini-budget-item">
+                      <div className="mini-budget-info">
+                        <span>{item.category}</span>
+                        <span>{Math.round(percent)}%</span>
                       </div>
-                    ))
-                  ) : (
-                    <p className="ai-empty">Add more transactions for AI tips!</p>
-                  )}
-                </div>
+                      <div className="mini-progress-bg">
+                        <div
+                          className="mini-progress-fill"
+                          style={{
+                            width: `${percent}%`,
+                            backgroundColor: percent > 90 ? '#ef4444' : percent > 70 ? '#f97316' : '#22c55e'
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="no-budget-msg">No budgets set. Click manage to start!</p>
               )}
             </div>
-            <button className="ai-refresh-btn" onClick={fetchAIInsights} disabled={loadingAI}>
-              {loadingAI ? "Consulting..." : "Refresh Advice"}
-            </button>
           </div>
 
           <div className="chart-container">
-            <h2 className="section-title">Monthly Analytics</h2>
+            <div className="chart-header-row">
+              <h2 className="section-title">Monthly Analytics</h2>
+              <div className="chart-controls">
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="category-filter-select"
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Food">Food</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Health">Health</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="General">General</option>
+                </select>
+              </div>
+            </div>
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -383,45 +486,9 @@ const Dashboard = () => {
               )}
             </div>
           </div>
-
-          <div className="recent-section">
-            <div className="recent-header">
-              <h2 className="section-title">All Activities</h2>
-              <button className="view-all" onClick={() => navigate("/transactions")}>View All</button>
-            </div>
-            <div className="transaction-list">
-              {transactions.length > 0 ? (
-                transactions.slice(0, 5).map(item => (
-                  <div key={item._id} className="transaction-item">
-                    <div className={`transaction-icon-box ${item.type}`}>
-                      {item.type === 'income' ? <FiArrowUpRight /> : <FiArrowDownLeft />}
-                    </div>
-                    <div className="transaction-info">
-                      <span className="transaction-title">{item.title}</span>
-                      <span className="transaction-date">{new Date(item.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="transaction-amount-group">
-                      <span className={`transaction-amount ${item.type}`}>
-                        {item.type === 'income' ? '+' : '-'} Rs {item.amount}
-                      </span>
-                      <button
-                        className="delete-btn-ghost"
-                        onClick={() => deleteTransaction(item._id)}
-                        title="Delete"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="no-data">No transactions yet.</p>
-              )}
-            </div>
-          </div>
         </div>
-      </section >
-    </div >
+      </section>
+    </div>
   );
 };
 
