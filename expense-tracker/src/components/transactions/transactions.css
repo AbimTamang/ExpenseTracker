@@ -167,11 +167,81 @@
   font-weight: 600;
   color: var(--text-muted);
   font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .filter-btn:hover {
   background: #f8fafc;
   color: var(--text-main);
+  border-color: var(--primary);
+}
+
+/* Filter wrapper for positioning the dropdown */
+.filter-wrapper {
+  position: relative;
+}
+
+/* Dropdown panel */
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  min-width: 180px;
+  animation: dropIn 0.15s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Each option button */
+.filter-option {
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.filter-option:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary);
+}
+
+.filter-option.active {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Badge shown next to "Recent Activity" when filter is active */
+.filter-active-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  vertical-align: middle;
 }
 
 .history-list {

@@ -31,6 +31,11 @@ router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ success: false, message: "Password must be at least 8 characters long, contain at least one uppercase letter, and at least one special character." });
+    }
+
     const hashed = await bcrypt.hash(password, 10);
 
     await pool.query(
@@ -112,6 +117,57 @@ router.post("/google", async (req, res) => {
       user = userRes.rows[0];
     }
 
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Save OTP to user
+    await pool.query(
+      "UPDATE users SET otp=$1, otp_expires=$2 WHERE email=$3",
+      [otp, otpExpires, email]
+    );
+
+    // Send Email
+    await sendEmail({
+      to: email,
+      subject: "Your Google Login OTP",
+      html: `
+        <h2>Login Verification</h2>
+        <p>Your OTP for Google Login is: <strong>${otp}</strong></p>
+        <p>This OTP will expire in 10 minutes.</p>
+      `,
+    });
+
+    res.json({ success: true, requiresOtp: true, email: user.email, message: "OTP sent to your email" });
+
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    res.status(500).json({ success: false, message: "Google Authentication Failed" });
+  }
+});
+
+/* ================= VERIFY GOOGLE OTP ================= */
+router.post("/verify-google-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const userRes = await pool.query(
+      "SELECT * FROM users WHERE email=$1 AND otp=$2 AND otp_expires > NOW()",
+      [email, otp]
+    );
+
+    if (userRes.rows.length === 0) {
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+    }
+
+    const user = userRes.rows[0];
+
+    // Clear OTP
+    await pool.query(
+      "UPDATE users SET otp=NULL, otp_expires=NULL WHERE email=$1",
+      [email]
+    );
+
     // Generate our own JWT token for the session
     const jwtToken = jwt.sign(
       { id: user.id },
@@ -120,10 +176,9 @@ router.post("/google", async (req, res) => {
     );
 
     res.json({ success: true, token: jwtToken, name: user.name });
-
   } catch (err) {
-    console.error("Google Auth Error:", err);
-    res.status(500).json({ success: false, message: "Google Authentication Failed" });
+    console.error("Verify Google OTP Error:", err);
+    res.status(500).json({ success: false, message: "OTP Verification Failed" });
   }
 });
 
@@ -182,6 +237,11 @@ router.post("/forgot-password", async (req, res) => {
 router.post("/reset-password", async (req, res) => {
   try {
     const { token, password } = req.body;
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ success: false, message: "Password must be at least 8 characters long, contain at least one uppercase letter, and at least one special character." });
+    }
 
     const userRes = await pool.query(
       `SELECT id FROM users

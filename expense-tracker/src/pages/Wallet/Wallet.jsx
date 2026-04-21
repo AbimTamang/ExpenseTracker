@@ -6,6 +6,7 @@ const Wallet = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("investments");
   const token = localStorage.getItem("token");
+  const currency = localStorage.getItem("currency") || "Rs";
 
   // Investments state
   const [investments, setInvestments] = useState([]);
@@ -39,6 +40,10 @@ const Wallet = () => {
 
   const addInvestment = async (e) => {
     e.preventDefault();
+    if (parseFloat(invAmount) <= 0) {
+      alert("Investment amount must be a positive number.");
+      return;
+    }
     const res = await fetch("http://localhost:5000/api/investments/add", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -59,6 +64,10 @@ const Wallet = () => {
 
   const addGoal = async (e) => {
     e.preventDefault();
+    if (parseFloat(goalTargetAmount) <= 0) {
+      alert("Target amount must be a positive number.");
+      return;
+    }
     const res = await fetch("http://localhost:5000/api/goals/add", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -74,7 +83,10 @@ const Wallet = () => {
 
   const addFunds = async (id) => {
     const amount = fundAmount[id];
-    if (!amount) return;
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Deposit amount must be a positive number.");
+      return;
+    }
     const res = await fetch(`http://localhost:5000/api/goals/add-funds/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -118,7 +130,7 @@ const Wallet = () => {
             <form className="add-card" onSubmit={addInvestment}>
               <h2>Add New Investment</h2>
               <input placeholder="Investment Name (e.g., Apple Stock, BTC)" value={invTitle} onChange={(e) => setInvTitle(e.target.value)} required />
-              <input type="number" placeholder="Amount Invested (Rs)" value={invAmount} onChange={(e) => setInvAmount(e.target.value)} required />
+              <input type="number" placeholder={`Amount Invested (${currency})`} value={invAmount} onChange={(e) => setInvAmount(e.target.value)} min="0" step="any" required />
               <select value={invCategory} onChange={(e) => setInvCategory(e.target.value)}>
                 <option value="Stocks">Stocks</option>
                 <option value="Crypto">Crypto</option>
@@ -139,7 +151,7 @@ const Wallet = () => {
                     <small>Purchased: {new Date(item.created_at).toLocaleDateString()}</small>
                   </div>
                   <div className="right">
-                    <h3 className="income">Rs {item.amount}</h3>
+                    <h3 className="income">{currency} {item.amount}</h3>
                     <button onClick={() => deleteInvestment(item.id)}>Sell / Remove</button>
                   </div>
                 </div>
@@ -152,7 +164,7 @@ const Wallet = () => {
             <form className="add-card" onSubmit={addGoal}>
               <h2>Create Saving Goal</h2>
               <input placeholder="Goal Title (e.g., Dream Car, Vacation)" value={goalTitle} onChange={(e) => setGoalTitle(e.target.value)} required />
-              <input type="number" placeholder="Target Amount (Rs)" value={goalTargetAmount} onChange={(e) => setGoalTargetAmount(e.target.value)} required />
+              <input type="number" placeholder={`Target Amount (${currency})`} value={goalTargetAmount} onChange={(e) => setGoalTargetAmount(e.target.value)} min="0" step="any" required />
               <input type="date" value={goalDeadline} onChange={(e) => setGoalDeadline(e.target.value)} required />
               <button type="submit">Set My Goal</button>
             </form>
@@ -173,8 +185,8 @@ const Wallet = () => {
                     </div>
 
                     <div className="goal-amounts">
-                      <span>Saved <strong>Rs {item.current_amount}</strong></span>
-                      <span>Target <strong>Rs {item.target_amount}</strong></span>
+                      <span>Saved <strong>{currency} {item.current_amount}</strong></span>
+                      <span>Target <strong>{currency} {item.target_amount}</strong></span>
                     </div>
 
                     <div className="fund-section">
@@ -183,6 +195,8 @@ const Wallet = () => {
                         placeholder="Amount to add..."
                         value={fundAmount[item.id] || ""}
                         onChange={(e) => setFundAmount({ ...fundAmount, [item.id]: e.target.value })}
+                        min="0"
+                        step="any"
                       />
                       <button onClick={() => addFunds(item.id)}>Deposit</button>
                     </div>

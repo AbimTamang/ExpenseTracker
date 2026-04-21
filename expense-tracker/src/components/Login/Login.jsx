@@ -7,9 +7,12 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [otpRequired, setOtpRequired] = useState(false);
+  const [emailForOtp, setEmailForOtp] = useState("");
+  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
-  // 🔐 LOGIN HANDLER
+  //  LOGIN HANDLER
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -32,7 +35,7 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // ✅ SAVE LOGIN INFO
+        // SAVE LOGIN INFO
         localStorage.setItem("token", data.token);
         localStorage.setItem("name", data.name);
 
@@ -57,14 +60,47 @@ const Login = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("name", data.name);
-        navigate("/dashboard");
+        if (data.requiresOtp) {
+          setOtpRequired(true);
+          setEmailForOtp(data.email);
+        } else {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("name", data.name);
+          navigate("/dashboard");
+        }
       } else {
         alert(data.message || "Google authentication failed");
       }
     } catch (err) {
       alert("Server error during Google auth");
+    }
+  };
+
+  const handleVerifyGoogleOtp = async (e) => {
+    e.preventDefault();
+    if (!otp) {
+      alert("Please enter the OTP.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/verify-google-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailForOtp, otp }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("name", data.name);
+        setTimeout(() => navigate("/dashboard"), 600);
+      } else {
+        alert(data.message || "Invalid OTP");
+      }
+    } catch (error) {
+      alert("Server error. Try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -98,75 +134,103 @@ const Login = () => {
             <p className="subtitle">Enter your credentials to access your account.</p>
           </div>
 
-          <form className="login-form" onSubmit={handleLogin}>
-            <div className="input-group">
-              <label>Email Address</label>
-              <div className="input-with-icon">
-                <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+          {otpRequired ? (
+            <form className="login-form" onSubmit={handleVerifyGoogleOtp}>
+              <div className="input-group">
+                <label>Enter Verification Code</label>
+                <div className="input-with-icon">
+                  <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <button className={`login-btn ${isLoading ? 'loading' : ''}`} type="submit" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify OTP"}
+              </button>
+
+              <p className="signup-text" style={{marginTop: "1.5rem"}}>
+                <span onClick={() => { setOtpRequired(false); setOtp(""); }} className="signup-link">
+                  Cancel
+                </span>
+              </p>
+            </form>
+          ) : (
+            <form className="login-form" onSubmit={handleLogin}>
+              <div className="input-group">
+                <label>Email Address</label>
+                <div className="input-with-icon">
+                  <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  <input
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Password</label>
+                <div className="input-with-icon">
+                  <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="options">
+                <label className="checkbox-container">
+                  <input type="checkbox" id="remember" />
+                  <span className="checkmark"></span>
+                  Remember me for 30 days
+                </label>
+
+                <span className="forgot-link" onClick={() => navigate("/forgot-password")}>
+                  Forgot password?
+                </span>
+              </div>
+
+              <button className={`login-btn ${isLoading ? 'loading' : ''}`} type="submit" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in to account"}
+              </button>
+
+              <div className="divider">
+                <span>Or continue with</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    alert('Google Login failed. Please try again.');
+                  }}
+                  shape="rectangular"
+                  size="large"
+                  text="signin_with"
+                  logo_alignment="left"
                 />
               </div>
-            </div>
 
-            <div className="input-group">
-              <label>Password</label>
-              <div className="input-with-icon">
-                <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="options">
-              <label className="checkbox-container">
-                <input type="checkbox" id="remember" />
-                <span className="checkmark"></span>
-                Remember me for 30 days
-              </label>
-
-              <span className="forgot-link" onClick={() => navigate("/forgot-password")}>
-                Forgot password?
-              </span>
-            </div>
-
-            <button className={`login-btn ${isLoading ? 'loading' : ''}`} type="submit" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in to account"}
-            </button>
-
-            <div className="divider">
-              <span>Or continue with</span>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => {
-                  alert('Google Login failed. Please try again.');
-                }}
-                shape="rectangular"
-                size="large"
-                text="signin_with"
-                logo_alignment="left"
-              />
-            </div>
-
-            <p className="signup-text">
-              Don't have an account?{" "}
-              <span onClick={() => navigate("/signup")} className="signup-link">
-                Create an account
-              </span>
-            </p>
-          </form>
+              <p className="signup-text">
+                Don't have an account?{" "}
+                <span onClick={() => navigate("/signup")} className="signup-link">
+                  Create an account
+                </span>
+              </p>
+            </form>
+          )}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [currency, setCurrency] = useState("Rs");
+  const [currency, setCurrency] = useState(localStorage.getItem("currency") || "Rs");
 
   const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem("token");
@@ -185,11 +185,19 @@ const Settings = () => {
               <div className="settings-form">
                 <div className="input-group">
                   <label>Default Currency</label>
-                  <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                  <select 
+                    value={currency} 
+                    onChange={(e) => {
+                      const newCurr = e.target.value;
+                      setCurrency(newCurr);
+                      localStorage.setItem("currency", newCurr);
+                      alert("Currency preference saved! Changes will reflect across the app.");
+                    }}
+                  >
                     <option value="Rs">₨ Rupee (NPR/INR)</option>
-                    <option value="USD">$ US Dollar (USD)</option>
-                    <option value="EUR">€ Euro (EUR)</option>
-                    <option value="GBP">£ British Pound (GBP)</option>
+                    <option value="$">$ US Dollar (USD)</option>
+                    <option value="€">€ Euro (EUR)</option>
+                    <option value="£">£ British Pound (GBP)</option>
                   </select>
                   <p className="helper-text">This symbol will be shown across your dashboard and transactions.</p>
                 </div>

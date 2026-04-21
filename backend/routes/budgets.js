@@ -66,4 +66,20 @@ router.get("/stats", requireAuth, async (req, res) => {
   }
 });
 
+// Delete a budget for a category
+router.delete("/:category", requireAuth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { category } = req.params;
+
+    const query = "DELETE FROM budgets WHERE user_id = $1 AND category = $2";
+    await pool.query(query, [userId, category]);
+
+    res.json({ success: true, message: "Budget deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 module.exports = router;

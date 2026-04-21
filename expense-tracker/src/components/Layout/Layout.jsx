@@ -10,7 +10,9 @@ import {
     FiLogOut,
     FiSun,
     FiMoon,
-    FiTarget
+    FiTarget,
+    FiMenu,
+    FiX
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import "./Layout.css";
@@ -19,6 +21,7 @@ const Layout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -45,7 +48,21 @@ const Layout = () => {
 
     return (
         <div className="layout-container">
-            <div className="sidebar">
+            {/* Mobile Header */}
+            <div className="mobile-header">
+                <div className="brand" onClick={() => navigate("/dashboard")}>
+                    <div className="brand-icon"><FiTrendingUp /></div>
+                    <h2>Fintrack</h2>
+                </div>
+                <button className="burger-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                    {isSidebarOpen ? <FiX /> : <FiMenu />}
+                </button>
+            </div>
+
+            {/* Sidebar Overlay for Mobile */}
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
+            <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-top">
                     <div className="brand" onClick={() => navigate("/dashboard")}>
                         <div className="brand-icon"><FiTrendingUp /></div>
@@ -57,7 +74,10 @@ const Layout = () => {
                             <div
                                 key={item.label}
                                 className={`nav-item ${location.pathname === item.path ? "active" : ""}`}
-                                onClick={() => navigate(item.path)}
+                                onClick={() => {
+                                    navigate(item.path);
+                                    setIsSidebarOpen(false);
+                                }}
                             >
                                 {item.icon}
                                 <span>{item.label}</span>

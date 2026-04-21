@@ -1,0 +1,88 @@
+title,merchant,amount,category
+pizza hut dinner,Pizza Hut,800,Food
+lunch at canteen,Canteen,150,Food
+burger meal,Burger King,500,Food
+coffee at cafe,Starbucks,300,Food
+breakfast at hotel,Hotel,250,Food
+snacks,Local Shop,100,Food
+dinner with friends,Restaurant,1200,Food
+food delivery,Foodmandu,600,Food
+kfc meal,KFC,700,Food
+milk and bread,Grocery,200,Food
+bus fare,City Bus,30,Transport
+taxi ride,Pathao,200,Transport
+fuel refill,Petrol Pump,2500,Transport
+bike servicing,Garage,1500,Transport
+uber ride,Uber,300,Transport
+metro ticket,Metro,50,Transport
+parking fee,Parking,100,Transport
+vehicle repair,Workshop,4000,Transport
+airplane ticket,Buddha Air,8000,Transport
+electricity bill,NEA,2500,Bills
+water bill,KUKL,500,Bills
+internet bill,Worldlink,1500,Bills
+mobile recharge,Ncell,200,Bills
+gas bill,Supplier,900,Bills
+electric bill payment,NEA,2600,Bills
+wifi bill,ISP,1200,Bills
+phone bill,Ncell,300,Bills
+room rent,Landlord,8000,Housing
+house rent,Owner,12000,Housing
+flat rent,Apartment,15000,Housing
+hostel rent,Hostel,5000,Housing
+rent payment,House Owner,9000,Housing
+apartment rent,Apartment,14000,Housing
+maintenance charge,Apartment,2000,Housing
+clothes shopping,Zara,5000,Shopping
+shoes purchase,Nike,7000,Shopping
+grocery shopping,Bhatbhateni,3000,Shopping
+online shopping,Daraz,2500,Shopping
+bag purchase,Local Store,1800,Shopping
+electronics purchase,Store,20000,Shopping
+mobile purchase,Apple Store,120000,Shopping
+watch purchase,Shop,3000,Shopping
+netflix subscription,Netflix,999,Entertainment
+movie ticket,Cinema,400,Entertainment
+spotify premium,Spotify,300,Entertainment
+gaming purchase,Steam,1200,Entertainment
+youtube premium,YouTube,250,Entertainment
+concert ticket,Event,2000,Entertainment
+game recharge,Game Store,500,Entertainment
+medicine purchase,Pharmacy,600,Health
+doctor visit,Hospital,1500,Health
+gym membership,Fitness Center,2000,Health
+health checkup,Clinic,1800,Health
+vitamin tablets,Medical Store,450,Health
+hospital bill,Hospital,5000,Health
+dental checkup,Dentist,1200,Health
+notebook purchase,Stationery Shop,200,Education
+online course,Udemy,1200,Education
+college fee,University,20000,Education
+book purchase,Bookstore,500,Education
+exam fee,College,1500,Education
+tuition fee,Institute,8000,Education
+course subscription,Online,2000,Education
+haircut,Salon,300,Personal
+cosmetics purchase,Shop,1000,Personal
+spa service,Spa,2500,Personal
+laundry service,Laundry,500,Personal
+beauty products,Store,1500,Personal
+gift purchase,Gift Shop,1000,Other
+random expense,,200,Other
+miscellaneous,,150,Other
+unknown expense,,300,Other
+donation,Charity,500,Other
+monthly salary,Company,50000,Salary
+salary payment,Office,55000,Salary
+income from job,Company,60000,Salary
+shop earnings,Shop,10000,Business
+product sales,Store,15000,Business
+daily sales,Business,8000,Business
+freelance project,Client,20000,Freelance
+web design payment,Client,15000,Freelance
+app development payment,Client,30000,Freelance
+stock profit,Share Market,5000,Investment
+crypto profit,Binance,7000,Investment
+dividend income,Company,3000,Investment
+
+

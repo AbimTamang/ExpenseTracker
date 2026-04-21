@@ -77,6 +77,11 @@ const Transactions = () => {
 
     e.preventDefault();
 
+    if (parseFloat(form.amount) <= 0) {
+      alert("Amount must be a positive number.");
+      return;
+    }
+
     await fetch("http://localhost:5000/api/transactions", {
 
       method: "POST",
@@ -197,6 +202,8 @@ const Transactions = () => {
                 placeholder="Amount"
                 value={form.amount}
                 onChange={handleChange}
+                min="0"
+                step="any"
                 required
               />
 

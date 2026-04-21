@@ -9,6 +9,7 @@ import {
 const Analytics = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const currency = localStorage.getItem("currency") || "Rs";
 
   // State
   const [transactions, setTransactions] = useState([]);
@@ -16,6 +17,12 @@ const Analytics = () => {
   const [areaData, setAreaData] = useState([]);
   const [period, setPeriod] = useState("month"); // 'month', 'year', 'all'
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Statement Upload State
+  const [statementFile, setStatementFile] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [uploadError, setUploadError] = useState("");
 
   // Clock effect
   useEffect(() => {
@@ -86,7 +93,40 @@ const Analytics = () => {
     setAreaData(Object.values(grouped));
   }, [transactions, period]);
 
-  const COLORS = ["#10b981", "#ef4444"];
+  const COLORS = ["#10b981", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899", "#14b8a6", "#f43f5e"];
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (!statementFile) {
+      setUploadError("Please select a file to upload.");
+      return;
+    }
+    setUploadError("");
+    setIsAnalyzing(true);
+    setAnalysisResult(null);
+
+    const formData = new FormData();
+    formData.append("file", statementFile);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/expenses/upload-statement", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setAnalysisResult(data);
+      } else {
+        setUploadError(data.message || "Failed to analyze statement.");
+      }
+    } catch (err) {
+      setUploadError("An error occurred during upload. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="analytics-page">
@@ -122,7 +162,7 @@ const Analytics = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="name" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(value) => `Rs ${value}`} />
+                  <YAxis tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(value) => `${currency} ${value}`} />
                   <AreaTooltip
                     contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                   />
@@ -158,7 +198,7 @@ const Analytics = () => {
                     ))}
                   </Pie>
                   <PieTooltip
-                    formatter={(value) => `Rs ${value}`}
+                    formatter={(value) => `${currency} ${value}`}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                   />
                   <PieLegend verticalAlign="bottom" height={36} />
@@ -169,6 +209,69 @@ const Analytics = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Upload Statement Section */}
+      <div className="statement-upload-section chart-card" style={{ marginTop: '32px' }}>
+        <h3>Bank Statement Analysis</h3>
+        <p className="subtitle">Upload your bank statement (PDF or Image) to see categorize spending</p>
+
+        <form onSubmit={handleFileUpload} className="upload-form">
+          <input 
+            type="file" 
+            accept="image/*,application/pdf"
+            onChange={(e) => setStatementFile(e.target.files[0])}
+            className="file-input"
+          />
+          <button type="submit" disabled={isAnalyzing} className="upload-btn">
+            {isAnalyzing ? "Analyzing..." : "Analyze Statement"}
+          </button>
+        </form>
+
+        {uploadError && <p className="error-text">{uploadError}</p>}
+
+        {analysisResult && (
+          <div className="analysis-result">
+            <h4>Analysis Report</h4>
+            <div className="analysis-summary">
+              <div className="summary-item">
+                <span>Total Identified Amount:</span>
+                <strong>{currency} {analysisResult.totalAmount.toFixed(2)}</strong>
+              </div>
+            </div>
+            
+            <div className="category-percentages">
+              {Object.entries(analysisResult.percentages).sort(([,a], [,b]) => b - a).map(([category, percent], index) => (
+                <div key={category} className="category-bar-wrapper">
+                  <div className="category-info">
+                    <span className="cat-name">{category}</span>
+                    <span className="cat-value">{currency} {analysisResult.categoriesSum[category].toFixed(2)} ({percent}%)</span>
+                  </div>
+                  <div className="progress-bar-bg">
+                    <div 
+                      className="progress-bar-fill" 
+                      style={{ 
+                        width: `${percent}%`,
+                        backgroundColor: COLORS[index % COLORS.length]
+                      }} 
+                    />
+                  </div>
+                </div>
+              ))}
+              {Object.keys(analysisResult.percentages).length === 0 && (
+                <div className="no-data-msg">
+                  <p>No valid expenses found in the statement. Please ensure the image or PDF is clear and contains parsable text.</p>
+                  {analysisResult.textPreview && (
+                    <div className="debug-text-preview" style={{ marginTop: '16px', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                      <strong>Extracted raw text:</strong>
+                      <pre style={{ whiteSpace: 'pre-wrap', marginTop: '8px' }}>{analysisResult.textPreview}</pre>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

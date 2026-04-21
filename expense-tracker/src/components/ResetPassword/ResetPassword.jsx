@@ -23,6 +23,12 @@ const ResetPassword = () => {
       return;
     }
 
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      alert("Password must be at least 8 characters long, contain at least one uppercase letter, and at least one special character.");
+      return;
+    }
+
     setLoading(true);
 
     try {

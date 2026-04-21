@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiTarget, FiPlus, FiEdit2, FiCheck, FiX, FiPieChart } from "react-icons/fi";
+import { FiTarget, FiPlus, FiEdit2, FiCheck, FiX, FiPieChart, FiTrash2 } from "react-icons/fi";
 import "./Budgets.css";
 
 const Budgets = () => {
@@ -8,8 +8,9 @@ const Budgets = () => {
     const [isAdding, setIsAdding] = useState(false);
     const [newBudget, setNewBudget] = useState({ category: "", amount: "" });
     const token = localStorage.getItem("token");
+    const currency = localStorage.getItem("currency") || "Rs";
 
-    const categories = ["Food", "Transport", "Shopping", "Entertainment", "Health", "Utilities", "General"];
+    const categories = ["Food & Drinks", "Transportation", "Shopping", "Entertainment", "Healthcare", "Housing/Rent", "Other"];
 
     const fetchBudgets = async () => {
         try {
@@ -31,6 +32,12 @@ const Budgets = () => {
 
     const handleUpsert = async (e) => {
         e.preventDefault();
+        
+        if (parseFloat(newBudget.amount) <= 0) {
+            alert("Budget amount must be a positive number.");
+            return;
+        }
+
         try {
             const res = await fetch("http://localhost:5000/api/budgets/upsert", {
                 method: "POST",
@@ -51,6 +58,23 @@ const Budgets = () => {
             }
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleDelete = async (category) => {
+        if (window.confirm(`Are you sure you want to delete the budget for ${category}?`)) {
+            try {
+                const res = await fetch(`http://localhost:5000/api/budgets/${category}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    fetchBudgets();
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 
@@ -76,7 +100,7 @@ const Budgets = () => {
 
             {isAdding && (
                 <div className="budget-form-card">
-                    <h3>{newBudget.id ? 'Edit Budget' : 'Add Strategic Budget'}</h3>
+                    <h3>{stats.some(s => s.category === newBudget.category) ? 'Edit Budget' : 'Add Strategic Budget'}</h3>
                     <form onSubmit={handleUpsert}>
                         <div className="form-row">
                             <div className="form-group">
@@ -93,12 +117,14 @@ const Budgets = () => {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Monthly Limit (Rs)</label>
+                                <label>Monthly Limit ({currency})</label>
                                 <input 
                                     type="number" 
                                     placeholder="e.g. 5000" 
                                     value={newBudget.amount}
                                     onChange={(e) => setNewBudget({...newBudget, amount: e.target.value})}
+                                    min="0"
+                                    step="any"
                                     required
                                 />
                             </div>
@@ -118,8 +144,10 @@ const Budgets = () => {
             <div className="budgets-grid">
                 {stats.length > 0 ? (
                     stats.map((item, idx) => {
-                        const percent = Math.min((item.current_spent / item.budget_limit) * 100, 100);
-                        const isOver = item.current_spent > item.budget_limit;
+                        const currentSpent = parseFloat(item.current_spent) || 0;
+                        const budgetLimit = parseFloat(item.budget_limit) || 0;
+                        const percent = Math.min((currentSpent / budgetLimit) * 100, 100);
+                        const isOver = currentSpent > budgetLimit;
 
                         return (
                             <div key={idx} className="budget-progress-card">
@@ -128,15 +156,25 @@ const Budgets = () => {
                                         <span className="cat-icon"><FiPieChart /></span>
                                         <h3>{item.category}</h3>
                                     </div>
-                                    <button 
-                                        className="edit-mini-btn"
-                                        onClick={() => {
-                                            setNewBudget({ category: item.category, amount: item.budget_limit });
-                                            setIsAdding(true);
-                                        }}
-                                    >
-                                        <FiEdit2 />
-                                    </button>
+                                    <div className="card-actions">
+                                        <button 
+                                            className="edit-mini-btn"
+                                            title="Edit Budget"
+                                            onClick={() => {
+                                                setNewBudget({ category: item.category, amount: budgetLimit });
+                                                setIsAdding(true);
+                                            }}
+                                        >
+                                            <FiEdit2 />
+                                        </button>
+                                        <button 
+                                            className="delete-mini-btn"
+                                            title="Delete Budget"
+                                            onClick={() => handleDelete(item.category)}
+                                        >
+                                            <FiTrash2 />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="budget-status">
@@ -144,7 +182,7 @@ const Budgets = () => {
                                         {isOver ? 'Over Budget!' : 'On Track'}
                                     </span>
                                     <span className="spent-text">
-                                        Rs {item.current_spent.toLocaleString()} / Rs {item.budget_limit.toLocaleString()}
+                                        {currency} {currentSpent.toLocaleString()} / {currency} {budgetLimit.toLocaleString()}
                                     </span>
                                 </div>
 
@@ -160,9 +198,9 @@ const Budgets = () => {
 
                                 <div className="budget-remaining">
                                     {isOver ? (
-                                        <span className="rem-text-danger">Exceeded by Rs {(item.current_spent - item.budget_limit).toLocaleString()}</span>
+                                        <span className="rem-text-danger">Exceeded by {currency} {(currentSpent - budgetLimit).toLocaleString()}</span>
                                     ) : (
-                                        <span className="rem-text">Rs {(item.budget_limit - item.current_spent).toLocaleString()} remaining</span>
+                                        <span className="rem-text">{currency} {(budgetLimit - currentSpent).toLocaleString()} remaining</span>
                                     )}
                                 </div>
                             </div>

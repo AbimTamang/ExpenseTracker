@@ -3,7 +3,8 @@ export function getToken() {
 }
 
 export function isAuthenticated() {
-  return Boolean(getToken());
+  const token = getToken();
+  return Boolean(token) && token !== "undefined" && token !== "null";
 }
 
 export function clearAuth() {

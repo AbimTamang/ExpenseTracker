@@ -27,6 +27,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || "User";
   const token = localStorage.getItem("token");
+  const currency = localStorage.getItem("currency") || "Rs";
 
   const [summary, setSummary] = useState({
     income: 0,
@@ -50,8 +51,6 @@ const Dashboard = () => {
 
   const [lookupDate, setLookupDate] = useState(() => toLocalDateString(new Date()));
   const [lookupResults, setLookupResults] = useState({ total: 0, items: [] });
-  const [aiForecast, setAiForecast] = useState(null);
-  const [loadingForecast, setLoadingForecast] = useState(false);
 
   // FETCH SUMMARY
   const fetchSummary = async () => {
@@ -83,25 +82,6 @@ const Dashboard = () => {
   };
 
 
-  const fetchAIForecast = async () => {
-    setLoadingForecast(true);
-    try {
-      const res = await fetch("http://localhost:5000/api/ai/predictions", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAiForecast(data.forecast);
-      } else {
-        setAiForecast(data.message || "Forecast currently unavailable.");
-      }
-    } catch (err) {
-      console.log("Forecast error:", err);
-      setAiForecast("Server connection error.");
-    } finally {
-      setLoadingForecast(false);
-    }
-  };
 
   const fetchBudgetStats = async () => {
     try {
@@ -165,7 +145,6 @@ const Dashboard = () => {
     }
     fetchSummary();
     fetchTransactions();
-    fetchAIForecast();
     fetchBudgetStats();
   }, []);
 
@@ -221,7 +200,7 @@ const Dashboard = () => {
                 <span className="card-label">Total Balance</span>
                 <div className="card-icon"><FiCreditCard /></div>
               </div>
-              <div className="card-value">Rs {summary.balance.toLocaleString()}</div>
+              <div className="card-value">{currency} {summary.balance.toLocaleString()}</div>
               <div className="card-footer positive">
                 <FiArrowUpRight /> <span>+2.5% from last month</span>
               </div>
@@ -232,7 +211,7 @@ const Dashboard = () => {
                 <span className="card-label">Overall Income</span>
                 <div className="card-icon"><FiArrowUpRight /></div>
               </div>
-              <div className="card-value">Rs {summary.income.toLocaleString()}</div>
+              <div className="card-value">{currency} {summary.income.toLocaleString()}</div>
             </div>
 
             <div className="card expense">
@@ -240,7 +219,7 @@ const Dashboard = () => {
                 <span className="card-label">Overall Expense</span>
                 <div className="card-icon"><FiArrowDownLeft /></div>
               </div>
-              <div className="card-value">Rs {summary.expense.toLocaleString()}</div>
+              <div className="card-value">{currency} {summary.expense.toLocaleString()}</div>
             </div>
           </div>
 
@@ -267,7 +246,7 @@ const Dashboard = () => {
                     return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                   })()}
                 </span>
-                <span className="lookup-stat-value">Rs {lookupResults.total.toLocaleString()}</span>
+                <span className="lookup-stat-value">{currency} {lookupResults.total.toLocaleString()}</span>
               </div>
 
               <div className="lookup-items">
@@ -275,7 +254,7 @@ const Dashboard = () => {
                   lookupResults.items.map(item => (
                     <div key={item._id} className="lookup-item">
                       <span className="item-name">{item.title}</span>
-                      <span className="item-price">Rs {Number(item.amount).toLocaleString()}</span>
+                      <span className="item-price">{currency} {Number(item.amount).toLocaleString()}</span>
                     </div>
                   ))
                 ) : (
@@ -304,7 +283,7 @@ const Dashboard = () => {
                     </div>
                     <div className="transaction-amount-group">
                       <span className={`transaction-amount ${item.type}`}>
-                        {item.type === 'income' ? '+' : '-'} Rs {item.amount}
+                        {item.type === 'income' ? '+' : '-'} {currency} {item.amount}
                       </span>
                       <button
                         className="delete-btn-ghost"
@@ -324,29 +303,6 @@ const Dashboard = () => {
         </div>
 
         <div className="content-secondary">
-          <div className="ai-forecast-card">
-            <div className="forecast-header">
-              <FiZap className="forecast-icon" />
-              <h3>AI Spending Forecast</h3>
-            </div>
-            {loadingForecast ? (
-              <div className="forecast-loading">Predicting next week...</div>
-            ) : aiForecast && typeof aiForecast === 'object' ? (
-              <div className="forecast-content">
-                <div className="forecast-stat">
-                  <span className="forecast-label">Estimated Next Week</span>
-                  <span className="forecast-value">Rs {aiForecast.estimatedNextWeek}</span>
-                </div>
-                <div className="forecast-stat">
-                  <span className="forecast-label">High Risk Category</span>
-                  <span className="forecast-value risk">{aiForecast.riskCategory}</span>
-                </div>
-                <p className="forecast-warning">{aiForecast.warning}</p>
-              </div>
-            ) : (
-              <p className="forecast-msg">{aiForecast || "Add more data for predictions."}</p>
-            )}
-          </div>
 
           <div className="today-box">
             <div className="today-header">
@@ -356,12 +312,12 @@ const Dashboard = () => {
             <div className="today-stats">
               <div className="stat-item">
                 <span className="stat-label">Income</span>
-                <span className="stat-value plus">+Rs {todayData.income}</span>
+                <span className="stat-value plus">+{currency} {todayData.income}</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
                 <span className="stat-label">Spent</span>
-                <span className="stat-value minus">-Rs {todayData.expense}</span>
+                <span className="stat-value minus">-{currency} {todayData.expense}</span>
               </div>
             </div>
           </div>
@@ -475,7 +431,7 @@ const Dashboard = () => {
                         </div>
                         <div className="insight-divider"></div>
                         <div className="insight-details">
-                          <span className="spent-on">Spent Rs {item.amount.toLocaleString()} on <strong>{item.title}</strong></span>
+                          <span className="spent-on">Spent {currency} {item.amount.toLocaleString()} on <strong>{item.title}</strong></span>
                           <span className="category-tag">{item.category || 'General'}</span>
                         </div>
                       </div>

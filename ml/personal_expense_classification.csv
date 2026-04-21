@@ -1,0 +1,201 @@
+expense_id,amount,merchant,description,category
+EXP1,50,Uber,ride to office,transport
+EXP2,15,McDonald's,burger meal,food
+EXP3,100,Amazon,wireless mouse,technology
+EXP4,40,Shell,fuel for car,transport
+EXP5,20,Starbucks,coffee break,food
+EXP6,150,Apple,app store purchase,technology
+EXP7,200,Walmart,grocery shopping,shopping
+EXP8,60,Netflix,monthly subscription,entertainment
+EXP9,30,Public Bus,bus fare to work,transport
+EXP10,12,Bakery,bread and milk,food
+EXP11,25,Pathao,bike ride,transport
+EXP12,500,Airlines,flight ticket,transport
+EXP13,15,Spotify,music subscription,entertainment
+EXP14,80,H&M,t-shirt,shopping
+EXP15,120,Pharmacy,medicines,health
+EXP16,5,Parking,city parking,transport
+EXP17,300,Best Buy,gaming monitor,technology
+EXP18,45,Gas Station,petrol,transport
+EXP19,10,Street Food,momos,food
+EXP20,250,Real Estate,rent payment,other
+EXP21,15,Uber,book a ride,transport
+EXP22,20,Indriver,taxi fare,transport
+EXP23,35,Pizza Hut,pizza delivery,food
+EXP24,12,KFC,chicken bucket,food
+EXP25,90,Zara,jacket,shopping
+EXP26,45,Steam,video game,entertainment
+EXP27,200,Hospital,doctor consultation,health
+EXP28,15,Cinema,movie ticket,entertainment
+EXP29,10,Vape Shop,liquid,other
+EXP30,55,Internet,monthly bill,utilities
+EXP31,15,Bus,bus ticket,transport
+EXP32,22,Taxi,ride home,transport
+EXP33,8,Cafe,morning tea,food
+EXP34,100,Dell,laptop charger,technology
+EXP35,60,Target,household items,shopping
+EXP36,18,Uber,ride to airport,transport
+EXP37,40,Electric,electricity bill,utilities
+EXP38,25,Water,water bill,utilities
+EXP39,150,Gym,membership fee,health
+EXP40,12,Subway,sandwich,food
+EXP41,30,Bolt,car ride,transport
+EXP42,20,Pathao,ride to mall,transport
+EXP43,15,Dunkin,donuts,food
+EXP44,70,Adidas,running shoes,shopping
+EXP45,100,Logitech,keyboard,technology
+EXP46,12,Vending Machine,soda,food
+EXP47,200,Dentist,tooth cleaning,health
+EXP48,30,Uber,ride to party,transport
+EXP49,15,App Store,icloud storage,technology
+EXP50,80,Disney+,yearly plan,entertainment
+EXP51,15,Uber,ride,transport
+EXP52,10,Cafe,coffee,food
+EXP53,100,Earphones,gaming headset,technology
+EXP54,40,Electronics Shop,gaming earphone,technology
+EXP55,150,Sony,headphones,technology
+EXP56,200,Nike,shoes,shopping
+EXP57,12,Grocery,apple,shopping
+EXP58,50,Amazon,keyboard,technology
+EXP59,30,Uber,taxi,transport
+EXP60,25,Gas,fuel,transport
+EXP61,15,McDonalds,burger,food
+EXP62,10,Bus,fair,transport
+EXP63,20,Subway,lunch,food
+EXP64,15,Spotify,music,entertainment
+EXP65,100,Steam,game,entertainment
+EXP66,50,Monitor,display,technology
+EXP67,120,Pharmacy,drugs,health
+EXP68,30,Uber,ride,transport
+EXP69,200,Rent,housing,other
+EXP70,45,Electric,power bill,utilities
+EXP71,15,Water,utility,utilities
+EXP72,100,GPU,graphics card,technology
+EXP73,30,CPU,processor,technology
+EXP74,20,Mouse,pointing device,technology
+EXP75,50,SSD,storage,technology
+EXP76,15,Pathao,ride,transport
+EXP77,10,Indriver,ride,transport
+EXP78,25,Uber,booking,transport
+EXP79,15,Bus,ticket,transport
+EXP80,50,Flight,plane ticket,transport
+EXP81,30,Train,railway ticket,transport
+EXP82,20,Auto,rickshaw ride,transport
+EXP83,15,Grocery,banana,shopping
+EXP84,10,Bread,breakfast,food
+EXP85,50,Internet,wifi bill,utilities
+EXP86,20,Phone,mobile recharge,utilities
+EXP87,100,Monitor,screen,technology
+EXP88,50,Headset,audio,technology
+EXP89,30,Speakers,sound system,technology
+EXP90,15,USB,pendrive,technology
+EXP91,20,Ram,memory,technology
+EXP92,10,Cable,hdmi,technology
+EXP93,5,Adapter,charger,technology
+EXP94,40,Pizza,dinner,food
+EXP95,15,Burger,snack,food
+EXP96,25,Steak,meal,food
+EXP97,100,Wine,drinks,food
+EXP98,50,Cloth,shirt,shopping
+EXP99,30,Shoes,sneakers,shopping
+EXP100,200,Watch,accessory,shopping
+EXP101,15,Uber,ride,transport
+EXP102,10,Cafe,latte,food
+EXP103,100,Airpods,headphones,technology
+EXP104,40,Logitech,mouse,technology
+EXP105,150,Bose,speakers,technology
+EXP106,200,Puma,sportswear,shopping
+EXP107,12,Supermarket,milk,shopping
+EXP108,50,Ebay,cables,technology
+EXP109,30,Uber,car,transport
+EXP110,25,Gas,petrol,transport
+EXP111,15,Burger King,meal,food
+EXP112,10,Bus,transport,transport
+EXP113,20,Taco Bell,dinner,food
+EXP114,15,Netflix,streaming,entertainment
+EXP115,100,Epic Games,fortnite,entertainment
+EXP116,50,Display,monitor,technology
+EXP117,120,Clinic,checkup,health
+EXP118,30,Uber,ride,transport
+EXP119,200,Apartment,rent,other
+EXP120,45,Power,electricity,utilities
+EXP121,15,Water,bill,utilities
+EXP122,100,Nvidia,rtx,technology
+EXP123,30,Intel,core i7,technology
+EXP124,20,Razer,gaming mouse,technology
+EXP125,50,Samsung,ssd,technology
+EXP126,15,Bike,ride,transport
+EXP127,10,Indriver,taxi,transport
+EXP128,25,Uber,cab,transport
+EXP129,15,Public Transport,bus,transport
+EXP130,50,Travel,flight,transport
+EXP131,30,Subway,metro,transport
+EXP132,20,Tuk Tuk,ride,transport
+EXP133,15,Fruit,mango,shopping
+EXP134,10,Cereal,breakfast,food
+EXP135,50,ISP,internet,utilities
+EXP136,20,Telecom,balance,utilities
+EXP137,100,Viewsonic,monitor,technology
+EXP138,50,Steelseries,earphone,technology
+EXP139,30,JBL,pods,technology
+EXP140,15,Kingston,flash drive,technology
+EXP141,20,Crucial,ram,technology
+EXP142,10,Belkin,usb-c,technology
+EXP143,5,Apple,magsafe,technology
+EXP144,40,Dominos,pizza,food
+EXP145,15,Five Guys,burger,food
+EXP146,25,Restaurant,steak,food
+EXP147,100,Liquor,alcohol,food
+EXP148,50,Levi's,jeans,shopping
+EXP149,30,Nike,trainers,shopping
+EXP150,200,Seiko,watch,shopping
+EXP151,15,Lyft,ride,transport
+EXP152,10,Tea,beverage,food
+EXP153,100,Sennheiser,pro headphones,technology
+EXP154,40,Corsair,keyboard,technology
+EXP155,150,Harman,audio,technology
+EXP156,200,Under Armour,gym wear,shopping
+EXP157,12,Whole Foods,eggs,shopping
+EXP158,50,BestBuy,gadgets,technology
+EXP159,30,Auto,fuel,transport
+EXP160,25,Chevron,gas,transport
+EXP161,15,Wendys,fast food,food
+EXP162,10,Local Bus,fair,transport
+EXP163,20,Panera,soup,food
+EXP164,15,HBO,sub,entertainment
+EXP165,100,Origin,games,entertainment
+EXP166,50,LG,monitor,technology
+EXP167,120,Hospital,billing,health
+EXP168,30,Uber,trip,transport
+EXP169,200,Landlord,rent,other
+EXP170,45,Utilities,electric,utilities
+EXP171,15,Water,payment,utilities
+EXP172,100,AMD,radeon,technology
+EXP173,30,Ryzen,processor,technology
+EXP174,20,Logitech,trackpad,technology
+EXP175,50,WD,hard drive,technology
+EXP176,15,Indriver,bike,transport
+EXP177,10,Uber,moto,transport
+EXP178,25,Lyft,car,transport
+EXP179,15,Greyhound,bus ticket,transport
+EXP180,50,JetBlue,flight ticket,transport
+EXP181,30,Amtrak,train,transport
+EXP182,20,Taxi,cab,transport
+EXP183,15,Market,tomatoes,shopping
+EXP184,10,Eggs,food,food
+EXP185,50,Verizon,internet,utilities
+EXP186,20,AT&T,bill,utilities
+EXP187,100,HP,display,technology
+EXP188,50,HyperX,gaming headset,technology
+EXP189,30,Creative,soundbar,technology
+EXP190,15,Sandisk,sd card,technology
+EXP191,20,Corsair,memory kit,technology
+EXP192,10,Anker,charging cable,technology
+EXP193,5,Ugreen,splitter,technology
+EXP194,40,Popeyes,fried chicken,food
+EXP195,15,Shake Shack,burger,food
+EXP196,25,Chipotle,burrito,food
+EXP197,100,Pub,drinks,food
+EXP198,50,Uniqlo,clothing,shopping
+EXP199,30,Reebok,shoes,shopping
+EXP200,200,Citizen,watch,shopping

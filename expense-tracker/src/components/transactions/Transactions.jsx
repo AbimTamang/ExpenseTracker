@@ -27,11 +27,16 @@ const Transactions = () => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
-  const [category, setCategory] = useState("Food");
+  const [category, setCategory] = useState("");
   const [date, setDate] = useState(() => toLocalDateString(new Date()));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [showFilter, setShowFilter] = useState(false);
+
+  const CATEGORIES = ["All", "Food & Drinks", "Housing/Rent", "Transportation", "Entertainment", "Salary/Income", "Healthcare", "Shopping", "Technology", "Other"];
 
   const token = localStorage.getItem("token");
+  const currency = localStorage.getItem("currency") || "Rs";
 
   const fetchTransactions = async () => {
     try {
@@ -58,6 +63,12 @@ const Transactions = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!title || !amount) return;
+
+    if (parseFloat(amount) <= 0) {
+      alert("Amount must be a positive number.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -129,14 +140,16 @@ const Transactions = () => {
               </div>
 
               <div className="input-group">
-                <label>Amount (Rs)</label>
+                <label>Amount ({currency})</label>
                 <div className="input-wrapper">
-                  <span className="currency-prefix">Rs</span>
+                  <span className="currency-prefix">{currency}</span>
                   <input
                     type="number"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
+                    min="0"
+                    step="any"
                     required
                   />
                 </div>
@@ -153,6 +166,7 @@ const Transactions = () => {
                 <div className="input-group">
                   <label>Category</label>
                   <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                    <option value="">Auto</option>
                     <option value="Food">Food & Drinks</option>
                     <option value="Rent">Housing/Rent</option>
                     <option value="Transport">Transportation</option>
@@ -160,6 +174,7 @@ const Transactions = () => {
                     <option value="Salary">Salary/Income</option>
                     <option value="Health">Healthcare</option>
                     <option value="Shopping">Shopping</option>
+                    <option value="Technology">Technology</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -188,19 +203,44 @@ const Transactions = () => {
         {/* TRANSACTIONS LIST */}
         <section className="history-section">
           <div className="history-header">
-            <h3>Recent Activity</h3>
-            <button className="filter-btn"><FiFilter /> <span>Filter</span></button>
+            <h3>Recent Activity
+              {filterCategory !== "All" && (
+                <span className="filter-active-badge">{filterCategory}</span>
+              )}
+            </h3>
+            <div className="filter-wrapper">
+              <button className="filter-btn" onClick={() => setShowFilter(p => !p)}>
+                <FiFilter /> <span>Filter</span>
+              </button>
+              {showFilter && (
+                <div className="filter-dropdown">
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat}
+                      className={`filter-option ${filterCategory === cat ? "active" : ""}`}
+                      onClick={() => { setFilterCategory(cat); setShowFilter(false); }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="history-list">
-            {transactions.length === 0 ? (
-              <div className="no-transactions">
-                <div className="empty-icon"><FiShoppingBag /></div>
-                <p>No transactions recorded yet.</p>
-              </div>
-            ) : (
-              transactions.map((item) => (
-                <div key={item._id} className={`history-item-card ${item.type}`}>
+            {(() => {
+              const filtered = filterCategory === "All"
+                ? transactions
+                : transactions.filter(t => t.category === filterCategory);
+              if (filtered.length === 0) return (
+                <div className="no-transactions">
+                  <div className="empty-icon"><FiShoppingBag /></div>
+                  <p>{filterCategory === "All" ? "No transactions recorded yet." : `No "${filterCategory}" transactions found.`}</p>
+                </div>
+              );
+              return filtered.map((item) => (
+                <div key={item.id} className={`history-item-card ${item.type}`}>
                   <div className="item-icon-box">
                     {item.type === 'income' ? <FiArrowUpRight /> : <FiArrowDownLeft />}
                   </div>
@@ -218,15 +258,15 @@ const Transactions = () => {
                   </div>
                   <div className="item-amount-group">
                     <span className={`item-price ${item.type}`}>
-                      {item.type === 'income' ? '+' : '-'} Rs {Number(item.amount).toLocaleString()}
+                      {item.type === 'income' ? '+' : '-'} {currency} {Number(item.amount).toLocaleString()}
                     </span>
-                    <button className="item-delete-btn" onClick={() => handleDelete(item._id)}>
+                    <button className="item-delete-btn" onClick={() => handleDelete(item.id)}>
                       <FiTrash2 />
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+              ));
+            })()}
           </div>
         </section>
       </div>
