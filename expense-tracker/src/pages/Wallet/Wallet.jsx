@@ -142,6 +142,18 @@ const Wallet = () => {
               <button type="submit">Record Investment</button>
             </form>
 
+            <div className="nepse-widget" style={{ marginTop: '24px', marginBottom: '24px', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--bg-secondary)', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+              <h2 style={{ padding: '16px 20px', margin: 0, borderBottom: '1px solid var(--border)', fontSize: '18px' }}>Live NEPSE Market Chart</h2>
+              <iframe 
+                src="https://nepsealpha.com/trading/chart" 
+                width="100%" 
+                height="500px" 
+                frameBorder="0" 
+                allowFullScreen
+                title="NEPSE Live Data"
+              ></iframe>
+            </div>
+
             <div className="list">
               {investments.map(item => (
                 <div key={item.id} className="transaction-card">

@@ -40,5 +40,5 @@ print(classification_report(y_test, y_pred))
 
 model_save_path = os.path.join(BASE_DIR, "expense_model.pkl")
 joblib.dump(model, model_save_path)
-print(f"\n✅ Model synced and saved as {model_save_path}")
+print(f"\n[SUCCESS] Model synced and saved as {model_save_path}")
 

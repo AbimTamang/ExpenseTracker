@@ -240,6 +240,19 @@ const Analytics = () => {
               </div>
             </div>
             
+            {Object.keys(analysisResult.categoriesSum).length > 0 && (
+              <div className="text-summary" style={{ margin: '16px 0', padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', borderLeft: '4px solid var(--primary-main)' }}>
+                <strong>Summary: </strong>
+                Based on the statement, you spent {
+                  Object.entries(analysisResult.categoriesSum)
+                    .sort(([,a], [,b]) => b - a)
+                    .map(([cat, sum]) => `${currency} ${sum.toFixed(2)} on ${cat}`)
+                    .join(", ")
+                    .replace(/,([^,]*)$/, ' and$1')
+                }.
+              </div>
+            )}
+            
             <div className="category-percentages">
               {Object.entries(analysisResult.percentages).sort(([,a], [,b]) => b - a).map(([category, percent], index) => (
                 <div key={category} className="category-bar-wrapper">

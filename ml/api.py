@@ -20,7 +20,7 @@ KEYWORD_RULES = [
     (["pathao", "indrive", "uber", "bus ticket", "taxi", "fuel", "petrol", "ride", "bike", "maintenance", "repair", "car", "scooter", "flight"], "Transportation"),
     (["momo", "pizza", "burger", "coffee", "restaurant", "tea", "dal bhat", "chowmein", "food"], "Food & Drinks"),
     (["medicine", "hospital", "doctor", "pharmacy", "clinic", "medical"], "Healthcare"),
-    (["salary", "freelance", "bonus", "client payment", "office", "payment", "income", "commission", "profit", "wage", "stipend", "deposit", "payroll"], "Salary/Income"),
+    (["salary", "freelance", "freelancing", "bonus", "client payment", "office", "payment", "income", "commission", "profit", "wage", "stipend", "deposit", "payroll"], "Salary/Income"),
     (["netflix", "spotify", "movie ticket", "games", "cinema", "entertainment"], "Entertainment"),
     (["bill", "utility", "electricity", "water", "internet", "wifi"], "Utilities"),
     (["insurance", "premium"], "Insurance"),

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./Settings.css";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -22,6 +24,83 @@ const Settings = () => {
     alert("Profile info saved locally (Database connection coming soon!)");
     localStorage.setItem("name", fullName);
   };
+
+  const handleExportPDF = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("http://localhost:5000/api/expenses/list", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!data.success || !data.transactions || data.transactions.length === 0) {
+        alert("No transactions found to export.");
+        return;
+      }
+
+      const transactions = data.transactions;
+      const doc = new jsPDF();
+
+      // Add Title
+      doc.setFontSize(22);
+      doc.setTextColor(40);
+      doc.text("Expense Tracker - Financial Report", 14, 22);
+
+      // Add Generation Date
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+      // Calculate Summary
+      let totalIncome = 0;
+      let totalExpense = 0;
+      transactions.forEach(t => {
+        if (t.type === 'income') totalIncome += Number(t.amount);
+        else totalExpense += Number(t.amount);
+      });
+      const balance = totalIncome - totalExpense;
+
+      // Summary Box
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text("Summary", 14, 45);
+      
+      doc.setFontSize(12);
+      doc.text(`Total Income: ${currency} ${totalIncome.toFixed(2)}`, 14, 55);
+      doc.text(`Total Expense: ${currency} ${totalExpense.toFixed(2)}`, 14, 63);
+      doc.text(`Net Balance: ${currency} ${balance.toFixed(2)}`, 14, 71);
+
+      // Table Data
+      const tableColumn = ["Date", "Title", "Category", "Type", "Amount"];
+      const tableRows = [];
+
+      transactions.forEach(t => {
+        const rowData = [
+          new Date(t.created_at).toLocaleDateString(),
+          t.title,
+          t.category,
+          t.type ? t.type.charAt(0).toUpperCase() + t.type.slice(1) : 'Unknown',
+          `${currency} ${t.amount}`
+        ];
+        tableRows.push(rowData);
+      });
+
+      // Generate Table using the imported autoTable function
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 85,
+        theme: 'striped',
+        headStyles: { fillColor: [41, 128, 185] },
+        styles: { fontSize: 10, cellPadding: 3 },
+      });
+
+      doc.save("Financial_Report.pdf");
+    } catch (err) {
+      console.error(err);
+      alert("Error generating PDF.");
+    }
+  };
+
 
   const handleExportData = async () => {
     if (!token) return;
@@ -214,8 +293,16 @@ const Settings = () => {
               <div className="data-section">
                 <div className="data-row">
                   <div>
+                    <h4>Export PDF Report</h4>
+                    <p>Download a beautiful, formatted PDF summary of your finances.</p>
+                  </div>
+                  <button onClick={handleExportPDF} className="btn-primary">Download PDF</button>
+                </div>
+
+                <div className="data-row" style={{ marginTop: '16px' }}>
+                  <div>
                     <h4>Export CSV Data</h4>
-                    <p>Download a copy of all your historical transactions.</p>
+                    <p>Download a raw spreadsheet of all your historical transactions.</p>
                   </div>
                   <button onClick={handleExportData} className="btn-secondary">Download CSV</button>
                 </div>

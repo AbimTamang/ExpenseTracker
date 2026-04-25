@@ -305,45 +305,60 @@ router.post("/upload-statement", requireAuth, upload.single("file"), async (req,
     const categoriesSum = {};
     let totalAmount = 0;
 
+    let pendingDescription = "";
+
     for (let line of lines) {
       if (!line.trim()) continue;
       
-      // Look for a realistic money amount. Matches 100, 100.00, etc. Avoid matching dates/years unnecesarily.
-      // E.g. skip 2024, 2023. We can match Rs. 100 or something. 
-      // If we blindly match numbers, we will match dates.
-      // Let's match numbers with optional decimal, at least some length or bounded by word boundaries or currency signs.
+      // Look for dates to remove them from lines
       const dateMatch = line.match(/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/);
-      // Skip metadata or summary lines that usually hold totals and balances
-      if (/balance|opening|closing|total|summary/i.test(line)) continue;
+      // Skip metadata or summary lines that usually hold totals, balances or interest
+      if (/balance|opening|closing|total|summary|interest|tax/i.test(line)) {
+        pendingDescription = "";
+        continue;
+      }
 
       let lineWithoutDate = line;
       if (dateMatch) {
          lineWithoutDate = line.replace(dateMatch[0], "");
       }
       
-      // Require either Rs/$/etc or a strict decimal ending
-      const amountMatch = lineWithoutDate.match(/(?:(?:Rs\.?|NPR|\$)\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i) 
-                          || lineWithoutDate.match(/\b(\d+(?:,\d{3})*\.\d{2})\b/);
+      // Try to match amounts. Also don't match percentages (using negative lookahead for %)
+      const amountMatch = lineWithoutDate.match(/(?:(?:Rs\.?|NPR|\$|INR)\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i) 
+                          || lineWithoutDate.match(/\b(\d+(?:,\d{3})*\.\d{2})\b(?!\s*%)/)
+                          || lineWithoutDate.match(/^\s*(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*$/);
       
       if (amountMatch) {
-        // Find the matched group (either index 1 or 2 depending on which side of the OR triggered)
-        const matchedStr = amountMatch[1] || amountMatch[2];
+        // Find the matched group
+        const matchedStr = amountMatch[1] || amountMatch[2] || amountMatch[3];
         if (!matchedStr) continue;
 
         // remove commas
         const amount = parseFloat(matchedStr.replace(/,/g, ""));
         
-        // Sanity checks: amount > 0, amount < 10000000 (1 crore), so we don't accidentally parse account IDs or phone IDs.
+        // Sanity checks: amount > 0, amount < 10000000 (1 crore)
         if (amount > 0 && amount < 10000000) {
-          // Remove amount from text to get description
-          const description = lineWithoutDate.replace(amountMatch[0], "").replace(/[^a-zA-Z\s]/g, " ").replace(/\s\s+/g, ' ').trim();
+          // Extract description from the same line if available
+          let description = lineWithoutDate.replace(amountMatch[0], "").replace(/[^a-zA-Z\s]/g, " ").replace(/\s\s+/g, ' ').trim();
+          
+          // If this line only had an amount, fallback to the description from the previous line
+          if (description.length < 3 && pendingDescription.length >= 3) {
+            description = pendingDescription;
+          }
           
           // Require at least a few letters in the description to prevent categorizing empty strings
           if (description.length >= 3) {
             const category = await predictCategory(description);
             categoriesSum[category] = (categoriesSum[category] || 0) + amount;
             totalAmount += amount;
+            pendingDescription = ""; // reset after use
           }
+        }
+      } else {
+        // If it's not an amount, maybe it's a description for the next line
+        const textOnly = lineWithoutDate.replace(/[^a-zA-Z\s]/g, " ").replace(/\s\s+/g, ' ').trim();
+        if (textOnly.length >= 3) {
+            pendingDescription = textOnly;
         }
       }
     }
