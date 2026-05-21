@@ -14,7 +14,7 @@ const Budgets = () => {
 
     const fetchBudgets = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/budgets/stats", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/stats`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -39,7 +39,7 @@ const Budgets = () => {
         }
 
         try {
-            const res = await fetch("http://localhost:5000/api/budgets/upsert", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/upsert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,7 +64,7 @@ const Budgets = () => {
     const handleDelete = async (category) => {
         if (window.confirm(`Are you sure you want to delete the budget for ${category}?`)) {
             try {
-                const res = await fetch(`http://localhost:5000/api/budgets/${category}`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/${category}`, {
                     method: "DELETE",
                     headers: { "Authorization": `Bearer ${token}` }
                 });

@@ -14,7 +14,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 async function predictCategory(text) {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/predict", {
+    const ML_API_URL = process.env.ML_API_URL || "http://127.0.0.1:8000";
+    const response = await axios.post(`${ML_API_URL}/predict`, {
       text: text
     });
     const category = response.data.category;
@@ -141,9 +142,15 @@ router.get("/list", requireAuth, async (req, res) => {
       [userId]
     );
 
+    // PostgreSQL numeric type returns strings — convert to actual numbers
+    const transactions = result.rows.map(row => ({
+      ...row,
+      amount: parseFloat(row.amount) || 0
+    }));
+
     res.json({
       success: true,
-      transactions: result.rows
+      transactions
     });
   } catch (err) {
     console.log(err);
@@ -163,7 +170,7 @@ router.get("/summary", requireAuth, async (req, res) => {
     const userId = req.userId;
 
     const income = await pool.query(
-      `SELECT SUM(amount)
+      `SELECT COALESCE(SUM(amount), 0) as total
        FROM expenses
        WHERE type='income'
        AND user_id=$1`,
@@ -171,15 +178,15 @@ router.get("/summary", requireAuth, async (req, res) => {
     );
 
     const expense = await pool.query(
-      `SELECT SUM(amount)
+      `SELECT COALESCE(SUM(amount), 0) as total
        FROM expenses
        WHERE type='expense'
        AND user_id=$1`,
       [userId]
     );
 
-    const incomeValue = income.rows[0].sum || 0;
-    const expenseValue = expense.rows[0].sum || 0;
+    const incomeValue = parseFloat(income.rows[0].total) || 0;
+    const expenseValue = parseFloat(expense.rows[0].total) || 0;
 
     res.json({
       success: true,
@@ -382,6 +389,169 @@ router.post("/upload-statement", requireAuth, upload.single("file"), async (req,
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ success: false, message: "Failed to process statement: " + err.message });
+  }
+});
+
+/* ======================
+   PARSE WALLET STATEMENT (eSewa / Khalti)
+   Forwards the PDF to the Python ML service
+====================== */
+
+router.post("/parse-wallet-statement", requireAuth, upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    // Forward the file to Python ML service
+    const FormData = require("form-data");
+    const formData = new FormData();
+    formData.append("file", req.file.buffer, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype,
+    });
+
+    const ML_API_URL = process.env.ML_API_URL || "http://127.0.0.1:8000";
+    const response = await axios.post(`${ML_API_URL}/parse_statement`, formData, {
+      headers: formData.getHeaders(),
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+    });
+
+    if (response.data.success) {
+      res.json({
+        success: true,
+        transactions: response.data.transactions,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: response.data.message || "Failed to parse statement",
+      });
+    }
+  } catch (err) {
+    console.error("Parse wallet statement error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to parse wallet statement",
+    });
+  }
+});
+
+/* ======================
+   IMPORT BULK TRANSACTIONS
+   Saves multiple parsed transactions at once
+====================== */
+
+router.post("/import-bulk", requireAuth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { transactions } = req.body;
+
+    if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
+      return res.status(400).json({ success: false, message: "No transactions to import" });
+    }
+
+    let imported = 0;
+    let skipped = 0;
+
+    for (const t of transactions) {
+      const { title, amount, type, category, date } = t;
+      if (!title || !amount) continue;
+
+      // Check if a similar transaction already exists to prevent duplicates
+      let duplicateCheck;
+      if (date) {
+        // If a date is provided, match exactly on user, title, amount, and the exact day
+        duplicateCheck = await pool.query(
+          `SELECT id FROM expenses 
+           WHERE user_id = $1 AND title = $2 AND amount = $3 
+           AND created_at::date = $4::date`,
+          [userId, title, amount, date]
+        );
+      } else {
+        // If no date is available, check if the exact same transaction was added recently (within 30 days)
+        duplicateCheck = await pool.query(
+          `SELECT id FROM expenses 
+           WHERE user_id = $1 AND title = $2 AND amount = $3 
+           AND created_at >= NOW() - INTERVAL '30 days'`,
+          [userId, title, amount]
+        );
+      }
+
+      if (duplicateCheck.rows.length > 0) {
+        skipped++;
+        continue; // Skip this duplicate transaction
+      }
+
+      const query = date
+        ? `INSERT INTO expenses (user_id, title, amount, type, category, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
+        : `INSERT INTO expenses (user_id, title, amount, type, category) VALUES ($1, $2, $3, $4, $5)`;
+
+      const params = date
+        ? [userId, title, amount, type || "expense", category || "Other", date]
+        : [userId, title, amount, type || "expense", category || "Other"];
+
+      await pool.query(query, params);
+      imported++;
+    }
+
+    res.json({ success: true, imported, skipped });
+  } catch (err) {
+    console.error("Bulk import error:", err);
+    res.status(500).json({ success: false, message: "Failed to import transactions" });
+  }
+});
+
+/* ======================
+   AI INSIGHTS
+====================== */
+
+router.get("/insights", requireAuth, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Fetch expenses for the current month
+    const result = await pool.query(
+      `SELECT title, amount, category, created_at as date 
+       FROM expenses 
+       WHERE user_id=$1 AND type='expense' 
+       AND created_at >= date_trunc('month', CURRENT_DATE)
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    const transactions = result.rows.map(row => ({
+      title: row.title,
+      amount: parseFloat(row.amount),
+      category: row.category,
+      date: new Date(row.date).toISOString().split("T")[0]
+    }));
+
+    if (transactions.length === 0) {
+      return res.json({
+        success: true,
+        insights: ["Not enough data for this month to generate insights. Add more expenses!"]
+      });
+    }
+
+    // Call the Python ML API
+    const ML_API_URL = process.env.ML_API_URL || "http://127.0.0.1:8000";
+    const response = await axios.post(`${ML_API_URL}/insights`, {
+      transactions
+    });
+
+    res.json({
+      success: true,
+      insights: response.data.insights || []
+    });
+
+  } catch (err) {
+    console.error("AI Insights error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate insights"
+    });
   }
 });
 

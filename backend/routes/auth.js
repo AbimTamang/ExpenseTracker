@@ -270,6 +270,36 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+/* ================= CHANGE PASSWORD ================= */
+router.post("/change-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({ success: false, message: "Password must be at least 8 characters long, contain at least one uppercase letter, and at least one special character." });
+    }
+
+    const userRes = await pool.query("SELECT password FROM users WHERE id=$1", [req.user.id]);
+    if (!userRes.rows.length) return res.status(404).json({ success: false, message: "User not found" });
+
+    const user = userRes.rows[0];
+    const match = await bcrypt.compare(oldPassword, user.password);
+
+    if (!match) {
+      return res.status(400).json({ success: false, message: "Incorrect current password" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await pool.query("UPDATE users SET password=$1 WHERE id=$2", [hashed, req.user.id]);
+
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 /* ================= RESET ACCOUNT DATA ================= */
 router.post("/reset-data", verifyToken, async (req, res) => {
   const userId = req.user.id;
@@ -300,6 +330,36 @@ router.post("/delete-account", verifyToken, async (req, res) => {
     res.json({ success: true, message: "Account deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to delete account" });
+  }
+});
+
+/* ================= GET PROFILE ================= */
+router.get("/profile", verifyToken, async (req, res) => {
+  try {
+    const userRes = await pool.query("SELECT name, email, weekly_summaries, goal_alerts, new_login_alerts FROM users WHERE id=$1", [req.user.id]);
+    if (userRes.rows.length === 0) return res.status(404).json({ success: false, message: "User not found" });
+    res.json({ success: true, profile: userRes.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to fetch profile" });
+  }
+});
+
+/* ================= UPDATE PROFILE ================= */
+router.put("/profile", verifyToken, async (req, res) => {
+  try {
+    const { name, weekly_summaries, goal_alerts, new_login_alerts } = req.body;
+    await pool.query(
+      `UPDATE users 
+       SET name=$1, 
+           weekly_summaries=COALESCE($2, weekly_summaries),
+           goal_alerts=COALESCE($3, goal_alerts),
+           new_login_alerts=COALESCE($4, new_login_alerts)
+       WHERE id=$5`, 
+      [name, weekly_summaries, goal_alerts, new_login_alerts, req.user.id]
+    );
+    res.json({ success: true, message: "Profile updated successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to update profile" });
   }
 });
 

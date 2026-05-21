@@ -40,7 +40,7 @@ const Transactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/list", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
         headers: { Authorization: `Bearer ${token} ` },
       });
       const data = await res.json();
@@ -72,7 +72,7 @@ const Transactions = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/add", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const Transactions = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this transaction?")) return;
     try {
-      await fetch(`http://localhost:5000/api/expenses/delete/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/expenses/delete/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

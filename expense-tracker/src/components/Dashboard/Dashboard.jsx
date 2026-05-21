@@ -39,6 +39,8 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState([]);
   const [budgetStats, setBudgetStats] = useState([]);
   const [filterCategory, setFilterCategory] = useState("All");
+  const [aiInsights, setAiInsights] = useState([]);
+  const [loadingInsights, setLoadingInsights] = useState(true);
 
   const toLocalDateString = (dateInput) => {
     if (!dateInput) return "";
@@ -55,7 +57,7 @@ const Dashboard = () => {
   // FETCH SUMMARY
   const fetchSummary = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/summary", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/summary`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -68,7 +70,7 @@ const Dashboard = () => {
   // FETCH TRANSACTIONS
   const fetchTransactions = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/list", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -85,13 +87,30 @@ const Dashboard = () => {
 
   const fetchBudgetStats = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/budgets/stats", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success) setBudgetStats(data.stats);
     } catch (err) {
       console.error("Error fetching budget stats:", err);
+    }
+  };
+
+  const fetchInsights = async () => {
+    try {
+      setLoadingInsights(true);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/insights`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAiInsights(data.insights);
+      }
+    } catch (err) {
+      console.error("Error fetching AI insights:", err);
+    } finally {
+      setLoadingInsights(false);
     }
   };
 
@@ -146,6 +165,7 @@ const Dashboard = () => {
     fetchSummary();
     fetchTransactions();
     fetchBudgetStats();
+    fetchInsights();
   }, []);
 
   useEffect(() => {
@@ -165,7 +185,7 @@ const Dashboard = () => {
   const deleteTransaction = async (id) => {
     if (!window.confirm("Are you sure you want to delete this transaction?")) return;
     try {
-      await fetch(`http://localhost:5000/api/expenses/delete/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/expenses/delete/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -177,6 +197,53 @@ const Dashboard = () => {
   };
 
   const todayData = getTodaySummary();
+
+  const calculateAchievements = () => {
+    const allAchievements = [
+      {
+        id: "first_blood",
+        title: "First Blood",
+        desc: "Log your first transaction",
+        icon: "🎯",
+        color: "#f43f5e",
+        unlocked: false
+      },
+      {
+        id: "centurion",
+        title: "Active Tracker",
+        desc: "Log 10+ transactions",
+        icon: "🔥",
+        color: "#f59e0b",
+        unlocked: false
+      },
+      {
+        id: "big_earner",
+        title: "Big Earner",
+        desc: "Log an income over 10,000",
+        icon: "💰",
+        color: "#10b981",
+        unlocked: false
+      },
+      {
+        id: "budget_master",
+        title: "Budget Master",
+        desc: "Stay under all active budgets",
+        icon: "🛡️",
+        color: "#4f46e5",
+        unlocked: false
+      }
+    ];
+
+    if (transactions.length > 0) allAchievements[0].unlocked = true;
+    if (transactions.length >= 10) allAchievements[1].unlocked = true;
+    if (transactions.some(t => t.type === 'income' && t.amount >= 10000)) allAchievements[2].unlocked = true;
+    if (budgetStats.length > 0 && budgetStats.every(b => (b.current_spent / b.budget_limit) < 1)) allAchievements[3].unlocked = true;
+
+    return allAchievements;
+  };
+
+  const achievements = calculateAchievements();
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
     <div className="dashboard-content">
@@ -200,7 +267,7 @@ const Dashboard = () => {
                 <span className="card-label">Total Balance</span>
                 <div className="card-icon"><FiCreditCard /></div>
               </div>
-              <div className="card-value">{currency} {summary.balance.toLocaleString()}</div>
+              <div className="card-value">{currency} {Number(summary.balance).toLocaleString()}</div>
               <div className="card-footer positive">
                 <FiArrowUpRight /> <span>+2.5% from last month</span>
               </div>
@@ -211,7 +278,7 @@ const Dashboard = () => {
                 <span className="card-label">Overall Income</span>
                 <div className="card-icon"><FiArrowUpRight /></div>
               </div>
-              <div className="card-value">{currency} {summary.income.toLocaleString()}</div>
+              <div className="card-value">{currency} {Number(summary.income).toLocaleString()}</div>
             </div>
 
             <div className="card expense">
@@ -219,7 +286,7 @@ const Dashboard = () => {
                 <span className="card-label">Overall Expense</span>
                 <div className="card-icon"><FiArrowDownLeft /></div>
               </div>
-              <div className="card-value">{currency} {summary.expense.toLocaleString()}</div>
+              <div className="card-value">{currency} {Number(summary.expense).toLocaleString()}</div>
             </div>
           </div>
 
@@ -283,7 +350,7 @@ const Dashboard = () => {
                     </div>
                     <div className="transaction-amount-group">
                       <span className={`transaction-amount ${item.type}`}>
-                        {item.type === 'income' ? '+' : '-'} {currency} {item.amount}
+                        {item.type === 'income' ? '+' : '-'} {currency} {Number(item.amount).toLocaleString()}
                       </span>
                       <button
                         className="delete-btn-ghost"
@@ -304,7 +371,51 @@ const Dashboard = () => {
 
         <div className="content-secondary">
 
-          <div className="today-box">
+          <div className="achievements-card glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
+            <div className="achievements-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '22px' }}>🏆</span> Your Achievements
+              </h3>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>{unlockedCount}/{achievements.length} Unlocked</span>
+            </div>
+            <div className="achievements-list" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+              {achievements.map(ach => (
+                <div key={ach.id} className="achievement-badge" style={{ 
+                    background: ach.unlocked ? 'var(--input-bg)' : 'rgba(15, 23, 42, 0.05)', 
+                    padding: '12px 16px', 
+                    borderRadius: '16px', 
+                    display: 'flex', 
+                    gap: '14px', 
+                    alignItems: 'center', 
+                    border: ach.unlocked ? '1px solid var(--border-color)' : '1px dashed var(--border-color)', 
+                    opacity: ach.unlocked ? 1 : 0.6,
+                    transition: 'all 0.3s' 
+                }}>
+                  <div className="ach-icon" style={{ 
+                      fontSize: '22px', 
+                      background: ach.unlocked ? 'var(--bg-card)' : 'transparent', 
+                      width: '44px', 
+                      height: '44px', 
+                      borderRadius: '12px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      boxShadow: ach.unlocked ? `0 4px 10px ${ach.color}33` : 'none', 
+                      flexShrink: 0, 
+                      filter: ach.unlocked ? 'none' : 'grayscale(100%)' 
+                  }}>
+                    {ach.unlocked ? ach.icon : '🔒'}
+                  </div>
+                  <div className="ach-info">
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: ach.unlocked ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '2px' }}>{ach.title}</h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '500' }}>{ach.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="today-box glass-card">
             <div className="today-header">
               <h3>Today's Activities</h3>
               <span className="today-date">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
@@ -312,12 +423,12 @@ const Dashboard = () => {
             <div className="today-stats">
               <div className="stat-item">
                 <span className="stat-label">Income</span>
-                <span className="stat-value plus">+{currency} {todayData.income}</span>
+                <span className="stat-value plus">+{currency} {Number(todayData.income).toLocaleString()}</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
                 <span className="stat-label">Spent</span>
-                <span className="stat-value minus">-{currency} {todayData.expense}</span>
+                <span className="stat-value minus">-{currency} {Number(todayData.expense).toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -408,6 +519,37 @@ const Dashboard = () => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="ai-advisor-card glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px', background: 'linear-gradient(145deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+            <div className="ai-advisor-header" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '24px' }}>🤖</span>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', background: 'linear-gradient(90deg, #6366f1, #10b981)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+                AI Financial Advisor
+              </h3>
+            </div>
+            <div className="ai-advisor-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {loadingInsights ? (
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Analyzing your spending patterns...</p>
+              ) : aiInsights.length > 0 ? (
+                aiInsights.map((insight, idx) => (
+                  <div key={idx} className="insight-bubble" style={{
+                    background: 'rgba(255, 255, 255, 0.5)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    color: 'var(--text-main)',
+                    lineHeight: '1.5',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                  }}>
+                    {insight}
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No insights available yet.</p>
+              )}
             </div>
           </div>
 

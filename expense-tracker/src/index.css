@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 /* RESET */
 * {
   margin: 0;
@@ -6,36 +8,64 @@
 }
 
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
+  /* Vibrant Colors */
+  --primary: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-dark: #3730a3;
   --secondary: #10b981;
+  --secondary-light: #34d399;
   --accent: #f59e0b;
-  --danger: #ef4444;
+  --danger: #f43f5e;
+  
+  /* Light Theme Variables */
   --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --sidebar-bg: #1e293b;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --sidebar-bg: #ffffff;
   --text-main: #0f172a;
   --text-muted: #64748b;
-  --border-color: #f1f5f9;
-  --input-bg: #f8fafc;
-  --glass: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --border-color: rgba(226, 232, 240, 0.8);
+  --input-bg: #f1f5f9;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 20px 40px -10px rgba(79, 70, 229, 0.2);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-danger: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  --gradient-bg: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
 }
 
 [data-theme='dark'] {
-  --bg-main: #0f172a;
-  --bg-card: #1e293b;
-  --sidebar-bg: #0b1120;
+  /* Dark Theme Variables */
+  --bg-main: #0b1120;
+  --bg-card: rgba(30, 41, 59, 0.7);
+  --sidebar-bg: rgba(15, 23, 42, 0.85);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --border-color: #334155;
-  --input-bg: #1e293b;
-  --glass: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6);
+  --border-color: rgba(51, 65, 85, 0.5);
+  --input-bg: rgba(15, 23, 42, 0.6);
+  
+  /* Dark Glassmorphism */
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  
+  /* Dark Shadows */
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  --shadow-hover: 0 20px 40px -10px rgba(129, 140, 248, 0.25);
+  
+  /* Dark Gradients */
+  --gradient-bg: linear-gradient(to bottom right, #0b1120, #0f172a, #1e1b4b);
 }
 
 /* FULL SCREEN */
@@ -45,27 +75,30 @@ body,
   width: 100%;
   height: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-main);
+  background: var(--gradient-bg);
+  background-attachment: fixed;
   color: var(--text-main);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(148, 163, 184, 0.5);
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(148, 163, 184, 0.8);
 }
 
 /* LINKS */
@@ -74,20 +107,29 @@ a {
   color: var(--primary);
   transition: color 0.2s;
 }
-
 a:hover {
-  color: var(--primary-dark);
+  color: var(--primary-light);
 }
 
 /* BUTTON DEFAULT */
 button {
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+button:active {
+  transform: scale(0.96);
 }
 
-button:active {
-  transform: scale(0.95);
+/* GLASS CARD UTILITY */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
 }

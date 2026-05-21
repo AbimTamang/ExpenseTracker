@@ -12,7 +12,9 @@ import {
     FiMoon,
     FiTarget,
     FiMenu,
-    FiX
+    FiX,
+    FiCalendar,
+    FiDownload
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import "./Layout.css";
@@ -43,6 +45,8 @@ const Layout = () => {
         { label: "Analytics", icon: <FiPieChart />, path: "/analytics" },
         { label: "Wallet", icon: <FiCreditCard />, path: "/wallet" },
         { label: "Budgets", icon: <FiTarget />, path: "/budgets" },
+        { label: "Calendar", icon: <FiCalendar />, path: "/calendar" },
+        { label: "Import", icon: <FiDownload />, path: "/import-statement" },
         { label: "Settings", icon: <FiSettings />, path: "/settings" }
     ];
 

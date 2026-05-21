@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Wallet.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Wallet = () => {
   const navigate = useNavigate();
@@ -27,13 +27,13 @@ const Wallet = () => {
   }, []);
 
   const fetchInvestments = async () => {
-    const res = await fetch("http://localhost:5000/api/investments/list", { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/investments/list`, { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     if (data.success) setInvestments(data.data);
   };
 
   const fetchGoals = async () => {
-    const res = await fetch("http://localhost:5000/api/goals/list", { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/list`, { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     if (data.success) setGoals(data.data);
   };
@@ -44,7 +44,7 @@ const Wallet = () => {
       alert("Investment amount must be a positive number.");
       return;
     }
-    const res = await fetch("http://localhost:5000/api/investments/add", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/investments/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ title: invTitle, amount: invAmount, category: invCategory })
@@ -58,7 +58,7 @@ const Wallet = () => {
   };
 
   const deleteInvestment = async (id) => {
-    await fetch(`http://localhost:5000/api/investments/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(`${import.meta.env.VITE_API_URL}/investments/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     fetchInvestments();
   };
 
@@ -68,7 +68,7 @@ const Wallet = () => {
       alert("Target amount must be a positive number.");
       return;
     }
-    const res = await fetch("http://localhost:5000/api/goals/add", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ title: goalTitle, target_amount: goalTargetAmount, deadline: goalDeadline })
@@ -87,7 +87,7 @@ const Wallet = () => {
       alert("Deposit amount must be a positive number.");
       return;
     }
-    const res = await fetch(`http://localhost:5000/api/goals/add-funds/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/add-funds/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ amount })
@@ -102,7 +102,7 @@ const Wallet = () => {
   };
 
   const deleteGoal = async (id) => {
-    await fetch(`http://localhost:5000/api/goals/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(`${import.meta.env.VITE_API_URL}/goals/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     fetchGoals();
   };
 
@@ -116,6 +116,9 @@ const Wallet = () => {
       </div>
 
       <div className="tab-container">
+        <button className={`tab-btn ${activeTab === "wallets" ? "active" : ""}`} onClick={() => setActiveTab("wallets")}>
+          💳 Digital Wallets
+        </button>
         <button className={`tab-btn ${activeTab === "investments" ? "active" : ""}`} onClick={() => setActiveTab("investments")}>
           📈 Investments Portfolio
         </button>
@@ -125,7 +128,55 @@ const Wallet = () => {
       </div>
 
       <div className="content">
-        {activeTab === "investments" ? (
+        {activeTab === "wallets" ? (
+          <div className="tab-content fade-in">
+            <div className="digital-wallets-grid">
+              {/* eSewa Card */}
+              <div className="dw-card esewa">
+                <div className="dw-card-header">
+                  <div className="dw-logo esewa-bg">e</div>
+                  <div className="dw-name">
+                    <h3>eSewa</h3>
+                    <span>Digital Wallet</span>
+                  </div>
+                </div>
+                <p className="dw-description">
+                  Nepal's #1 digital wallet. Upload your eSewa statement to auto-import all your transactions.
+                </p>
+                <Link to="/import-statement" className="dw-import-btn esewa-btn">
+                  📄 Import eSewa Statement
+                </Link>
+              </div>
+
+              {/* Khalti Card */}
+              <div className="dw-card khalti">
+                <div className="dw-card-header">
+                  <div className="dw-logo khalti-bg">K</div>
+                  <div className="dw-name">
+                    <h3>Khalti</h3>
+                    <span>Digital Wallet</span>
+                  </div>
+                </div>
+                <p className="dw-description">
+                  Nepal's smart digital wallet. Upload your Khalti statement to auto-import all your transactions.
+                </p>
+                <Link to="/import-statement" className="dw-import-btn khalti-btn">
+                  📄 Import Khalti Statement
+                </Link>
+              </div>
+            </div>
+
+            <div className="dw-info-box">
+              <h4>💡 How it works</h4>
+              <ol>
+                <li>Open your <strong>eSewa</strong> or <strong>Khalti</strong> app</li>
+                <li>Go to <strong>Statement</strong> and download your monthly PDF</li>
+                <li>Click <strong>Import Statement</strong> above and upload the PDF</li>
+                <li>Our AI will read and categorize every transaction automatically!</li>
+              </ol>
+            </div>
+          </div>
+        ) : activeTab === "investments" ? (
           <div className="tab-content fade-in">
             <form className="add-card" onSubmit={addInvestment}>
               <h2>Add New Investment</h2>

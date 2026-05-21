@@ -11,24 +11,123 @@ const Settings = () => {
   const [email, setEmail] = useState("");
   const [currency, setCurrency] = useState(localStorage.getItem("currency") || "Rs");
 
+  // Notifications State
+  const [weeklySummaries, setWeeklySummaries] = useState(true);
+  const [goalAlerts, setGoalAlerts] = useState(true);
+  const [newLoginAlerts, setNewLoginAlerts] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    setFullName(localStorage.getItem("name") || "John Doe");
-    setEmail("user@example.com"); // Placeholder for now
-  }, []);
+    if (!token) return;
+    fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.profile) {
+          setFullName(data.profile.name || "");
+          setEmail(data.profile.email || "");
+          localStorage.setItem("name", data.profile.name);
+          
+          if (data.profile.weekly_summaries !== undefined) setWeeklySummaries(data.profile.weekly_summaries);
+          if (data.profile.goal_alerts !== undefined) setGoalAlerts(data.profile.goal_alerts);
+          if (data.profile.new_login_alerts !== undefined) setNewLoginAlerts(data.profile.new_login_alerts);
+        }
+      })
+      .catch(err => console.error("Error fetching profile:", err));
+  }, [token]);
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    alert("Profile info saved locally (Database connection coming soon!)");
-    localStorage.setItem("name", fullName);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          name: fullName,
+          weekly_summaries: weeklySummaries,
+          goal_alerts: goalAlerts,
+          new_login_alerts: newLoginAlerts
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Profile updated successfully!");
+        localStorage.setItem("name", fullName);
+      } else {
+        alert("Failed to update profile.");
+      }
+    } catch (err) {
+      alert("Error updating profile.");
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match.");
+      return;
+    }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ oldPassword, newPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Password updated successfully!");
+        setShowPasswordModal(false);
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        alert(data.message || "Failed to update password.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error updating password.");
+    }
+  };
+
+  const handleToggleNotification = async (field, value) => {
+    if (field === 'weekly_summaries') setWeeklySummaries(value);
+    if (field === 'goal_alerts') setGoalAlerts(value);
+    if (field === 'new_login_alerts') setNewLoginAlerts(value);
+
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          name: fullName, 
+          [field]: value 
+        })
+      });
+    } catch (err) {
+      console.error("Error saving notification preference", err);
+    }
   };
 
   const handleExportPDF = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/list", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -106,7 +205,7 @@ const Settings = () => {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/export", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/export`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -133,7 +232,7 @@ const Settings = () => {
     if (!window.confirm("WARNING: This will erase all your transactions, investments, and goals. Your login will remain. Proceed?")) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/reset-data", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-data`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -154,7 +253,7 @@ const Settings = () => {
     if (!window.confirm("DANGER: This will permanently delete your entire account and all data. This cannot be undone. Proceed?")) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/delete-account", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/delete-account`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -244,7 +343,7 @@ const Settings = () => {
 
                 <div className="security-section">
                   <h3>Security</h3>
-                  <button type="button" className="btn-secondary">Change Password</button>
+                  <button type="button" className="btn-secondary" onClick={() => setShowPasswordModal(true)}>Change Password</button>
                   <p className="helper-text">If you logged in with Google, you cannot change your password here.</p>
                 </div>
 
@@ -340,7 +439,12 @@ const Settings = () => {
                     <h4>Weekly Summaries</h4>
                     <p>Receive an email every Monday breaking down last week's spending.</p>
                   </div>
-                  <input type="checkbox" className="toggle-switch" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    className="toggle-switch" 
+                    checked={weeklySummaries} 
+                    onChange={(e) => handleToggleNotification('weekly_summaries', e.target.checked)}
+                  />
                 </label>
 
                 <label className="toggle-row">
@@ -348,7 +452,12 @@ const Settings = () => {
                     <h4>Goal Alerts</h4>
                     <p>Notify me when I hit 50% or 100% of my Saving Goals.</p>
                   </div>
-                  <input type="checkbox" className="toggle-switch" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    className="toggle-switch" 
+                    checked={goalAlerts}
+                    onChange={(e) => handleToggleNotification('goal_alerts', e.target.checked)}
+                  />
                 </label>
 
                 <label className="toggle-row">
@@ -356,7 +465,12 @@ const Settings = () => {
                     <h4>New Login Alerts</h4>
                     <p>Send an email when my account is logged into from a new device.</p>
                   </div>
-                  <input type="checkbox" className="toggle-switch" />
+                  <input 
+                    type="checkbox" 
+                    className="toggle-switch" 
+                    checked={newLoginAlerts}
+                    onChange={(e) => handleToggleNotification('new_login_alerts', e.target.checked)}
+                  />
                 </label>
               </div>
             </div>
@@ -364,6 +478,48 @@ const Settings = () => {
 
         </div>
       </div>
+
+      {/* PASSWORD MODAL */}
+      {showPasswordModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Change Password</h2>
+            <form onSubmit={handleChangePassword} className="settings-form" style={{ marginTop: '20px' }}>
+              <div className="input-group">
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="input-group">
+                <label>New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="input-group">
+                <label>Confirm New Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button type="button" className="btn-secondary" onClick={() => setShowPasswordModal(false)}>Cancel</button>
+                <button type="submit" className="btn-primary">Update Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

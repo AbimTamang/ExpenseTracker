@@ -25,6 +25,8 @@ import Analytics from "./pages/Analytics/Analytics";
 import Settings from "./pages/Setting/Settings";
 import Wallet from "./pages/Wallet/Wallet";
 import Budgets from "./pages/Budgets/Budgets";
+import CalendarApp from "./pages/Calendar/CalendarApp";
+import ImportStatement from "./pages/ImportStatement/ImportStatement";
 
 function App() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
@@ -53,6 +55,8 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/budgets" element={<Budgets />} />
+              <Route path="/calendar" element={<CalendarApp />} />
+              <Route path="/import-statement" element={<ImportStatement />} />
             </Route>
           </Route>
 

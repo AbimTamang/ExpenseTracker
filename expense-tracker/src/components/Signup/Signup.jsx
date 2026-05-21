@@ -6,6 +6,7 @@ import { GoogleLogin } from '@react-oauth/google';
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -14,11 +15,32 @@ const Signup = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
+  // Email format validator
+  const validateEmail = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) return "Email address is required.";
+    if (!emailRegex.test(value)) return "Please enter a valid email address (e.g. name@example.com).";
+    return "";
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    setEmailError(validateEmail(value));
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
 
     if (!name || !email || !password || !confirmPassword) {
       alert("All fields are required.");
+      return;
+    }
+
+    // Validate email format before submitting
+    const emailValidationError = validateEmail(email);
+    if (emailValidationError) {
+      setEmailError(emailValidationError);
       return;
     }
 
@@ -36,7 +58,7 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -60,7 +82,7 @@ const Signup = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/google", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: credentialResponse.credential }),
@@ -91,7 +113,7 @@ const Signup = () => {
     }
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/verify-google-otp", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-google-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailForOtp, otp }),
@@ -192,10 +214,20 @@ const Signup = () => {
                       type="email"
                       placeholder="name@example.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleEmailChange}
+                      onBlur={() => setEmailError(validateEmail(email))}
+                      className={emailError ? "input-error" : ""}
                       required
                     />
                   </div>
+                  {emailError && (
+                    <p className="email-error-msg">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      {emailError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="input-group">

@@ -33,7 +33,7 @@ const Analytics = () => {
   // Fetch data
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:5000/api/expenses/list", {
+    fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -109,7 +109,7 @@ const Analytics = () => {
     formData.append("file", statementFile);
 
     try {
-      const res = await fetch("http://localhost:5000/api/expenses/upload-statement", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/upload-statement`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -211,81 +211,7 @@ const Analytics = () => {
         </div>
       </div>
 
-      {/* Upload Statement Section */}
-      <div className="statement-upload-section chart-card" style={{ marginTop: '32px' }}>
-        <h3>Bank Statement Analysis</h3>
-        <p className="subtitle">Upload your bank statement (PDF or Image) to see categorize spending</p>
 
-        <form onSubmit={handleFileUpload} className="upload-form">
-          <input 
-            type="file" 
-            accept="image/*,application/pdf"
-            onChange={(e) => setStatementFile(e.target.files[0])}
-            className="file-input"
-          />
-          <button type="submit" disabled={isAnalyzing} className="upload-btn">
-            {isAnalyzing ? "Analyzing..." : "Analyze Statement"}
-          </button>
-        </form>
-
-        {uploadError && <p className="error-text">{uploadError}</p>}
-
-        {analysisResult && (
-          <div className="analysis-result">
-            <h4>Analysis Report</h4>
-            <div className="analysis-summary">
-              <div className="summary-item">
-                <span>Total Identified Amount:</span>
-                <strong>{currency} {analysisResult.totalAmount.toFixed(2)}</strong>
-              </div>
-            </div>
-            
-            {Object.keys(analysisResult.categoriesSum).length > 0 && (
-              <div className="text-summary" style={{ margin: '16px 0', padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', borderLeft: '4px solid var(--primary-main)' }}>
-                <strong>Summary: </strong>
-                Based on the statement, you spent {
-                  Object.entries(analysisResult.categoriesSum)
-                    .sort(([,a], [,b]) => b - a)
-                    .map(([cat, sum]) => `${currency} ${sum.toFixed(2)} on ${cat}`)
-                    .join(", ")
-                    .replace(/,([^,]*)$/, ' and$1')
-                }.
-              </div>
-            )}
-            
-            <div className="category-percentages">
-              {Object.entries(analysisResult.percentages).sort(([,a], [,b]) => b - a).map(([category, percent], index) => (
-                <div key={category} className="category-bar-wrapper">
-                  <div className="category-info">
-                    <span className="cat-name">{category}</span>
-                    <span className="cat-value">{currency} {analysisResult.categoriesSum[category].toFixed(2)} ({percent}%)</span>
-                  </div>
-                  <div className="progress-bar-bg">
-                    <div 
-                      className="progress-bar-fill" 
-                      style={{ 
-                        width: `${percent}%`,
-                        backgroundColor: COLORS[index % COLORS.length]
-                      }} 
-                    />
-                  </div>
-                </div>
-              ))}
-              {Object.keys(analysisResult.percentages).length === 0 && (
-                <div className="no-data-msg">
-                  <p>No valid expenses found in the statement. Please ensure the image or PDF is clear and contains parsable text.</p>
-                  {analysisResult.textPreview && (
-                    <div className="debug-text-preview" style={{ marginTop: '16px', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                      <strong>Extracted raw text:</strong>
-                      <pre style={{ whiteSpace: 'pre-wrap', marginTop: '8px' }}>{analysisResult.textPreview}</pre>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

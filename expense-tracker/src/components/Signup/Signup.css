@@ -191,6 +191,24 @@
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
+/* EMAIL VALIDATION */
+.input-with-icon input.input-error {
+  border-color: #ef4444 !important;
+  background: #fff5f5 !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+.email-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ef4444;
+  animation: slideUp 0.2s ease-out;
+}
+
 .input-with-icon input:focus+.input-icon {
   color: #10b981;
 }

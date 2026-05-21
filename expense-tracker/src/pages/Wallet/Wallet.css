@@ -318,3 +318,158 @@
         transform: translateY(0);
     }
 }
+
+/* === DIGITAL WALLETS === */
+.digital-wallets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.dw-card {
+    background: white;
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dw-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    opacity: 0.06;
+    transform: translate(30%, -30%);
+}
+
+.dw-card.esewa::before {
+    background: #60bb46;
+}
+
+.dw-card.khalti::before {
+    background: #5c2d91;
+}
+
+.dw-card.esewa {
+    border-color: rgba(96, 187, 70, 0.2);
+}
+
+.dw-card.khalti {
+    border-color: rgba(92, 45, 145, 0.2);
+}
+
+.dw-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.dw-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.dw-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 24px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.esewa-bg {
+    background: linear-gradient(135deg, #60bb46, #4a9e35);
+}
+
+.khalti-bg {
+    background: linear-gradient(135deg, #5c2d91, #7b42b8);
+}
+
+.dw-name h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.dw-name span {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.dw-description {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.dw-import-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.esewa-btn {
+    background: rgba(96, 187, 70, 0.1);
+    color: #4a9e35;
+}
+
+.esewa-btn:hover {
+    background: #60bb46;
+    color: white;
+    box-shadow: 0 6px 20px rgba(96, 187, 70, 0.3);
+}
+
+.khalti-btn {
+    background: rgba(92, 45, 145, 0.1);
+    color: #5c2d91;
+}
+
+.khalti-btn:hover {
+    background: #5c2d91;
+    color: white;
+    box-shadow: 0 6px 20px rgba(92, 45, 145, 0.3);
+}
+
+.dw-info-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 24px 28px;
+}
+
+.dw-info-box h4 {
+    margin: 0 0 15px 0;
+    font-size: 17px;
+    color: #0369a1;
+}
+
+.dw-info-box ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.dw-info-box li {
+    color: #475569;
+    font-size: 14px;
+    line-height: 2;
+}

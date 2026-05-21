@@ -35,7 +35,7 @@ const Transactions = () => {
 
     try {
 
-      const res = await fetch("http://localhost:5000/api/transactions", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/transactions`, {
 
         headers: {
           Authorization: `Bearer ${token}`
@@ -82,7 +82,7 @@ const Transactions = () => {
       return;
     }
 
-    await fetch("http://localhost:5000/api/transactions", {
+    await fetch(`${import.meta.env.VITE_API_URL}/transactions`, {
 
       method: "POST",
 

@@ -76,6 +76,7 @@
     }
 }
 
+
 /* SIDEBAR */
 .settings-sidebar {
     background: var(--bg-main);
@@ -358,4 +359,103 @@
     width: 24px;
     height: 24px;
     accent-color: #3b82f6;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    animation: slideUp 0.25s ease-out;
+}
+
+.modal-content h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* ===== MOBILE RESPONSIVE (≤640px) ===== */
+@media (max-width: 640px) {
+    .settings-page {
+        padding: 20px 16px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .settings-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 16px 12px;
+        gap: 8px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        font-size: 12px;
+        padding: 10px 8px;
+        gap: 6px;
+    }
+
+    .tab-btn .icon {
+        font-size: 15px;
+    }
+
+    .settings-content {
+        padding: 20px 16px;
+    }
+
+    .input-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .data-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .danger-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-content {
+        padding: 24px 20px;
+        margin: 16px;
+        max-width: calc(100% - 32px);
+    }
 }

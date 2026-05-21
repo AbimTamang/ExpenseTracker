@@ -1,0 +1,291 @@
+.calendar-page {
+    padding: 20px 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.calendar-container {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+@media (max-width: 1100px) {
+    .calendar-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.calendar-wrapper-card, .day-details-card {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 40px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: flex;
+    background: var(--bg-main);
+    border-radius: 12px;
+    padding: 5px;
+    gap: 5px;
+    border: 1px solid var(--border-color);
+}
+
+.cal-filter-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cal-filter-btn:hover {
+    color: var(--text-primary);
+}
+
+.cal-filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Override react-calendar styles for glassmorphism */
+.glass-calendar.react-calendar {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+}
+
+.glass-calendar .react-calendar__navigation {
+    margin-bottom: 20px;
+}
+
+.glass-calendar .react-calendar__navigation button {
+    color: var(--text-primary);
+    min-width: 44px;
+    background: none;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.glass-calendar .react-calendar__navigation button:enabled:hover,
+.glass-calendar .react-calendar__navigation button:enabled:focus {
+    background-color: var(--bg-main);
+}
+
+.glass-calendar .react-calendar__month-view__weekdays {
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.glass-calendar .react-calendar__month-view__weekdays__weekday {
+    padding: 10px 0;
+    text-align: center;
+}
+
+.glass-calendar .react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
+}
+
+.glass-calendar .react-calendar__tile {
+    padding: 10px 5px;
+    background: none;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.glass-calendar .react-calendar__tile:enabled:hover,
+.glass-calendar .react-calendar__tile:enabled:focus {
+    background-color: var(--bg-main);
+    border-color: var(--border-color);
+}
+
+.glass-calendar .react-calendar__tile--active {
+    background: var(--bg-main) !important;
+    color: var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+}
+
+.glass-calendar .react-calendar__tile--now {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.calendar-tile-content {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    align-items: center;
+}
+
+.tile-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: 600;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tile-badge.expense {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.tile-badge.income {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+/* Day Details Sidebar */
+.day-details-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.day-details-header h2 {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.day-summary {
+    display: flex;
+    gap: 15px;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.summary-item.expense {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.summary-item.income {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.no-events {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.day-transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.cal-item-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: var(--bg-main);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cal-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.cal-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+.cal-item-card.expense .cal-item-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.cal-item-card.income .cal-item-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.cal-item-info {
+    flex: 1;
+}
+
+.cal-item-info h4 {
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+.cal-item-info span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.cal-item-amount {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.cal-item-amount.expense {
+    color: #ef4444;
+}
+
+.cal-item-amount.income {
+    color: #10b981;
+}
