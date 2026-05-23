@@ -3,6 +3,7 @@ import "./Settings.css";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { FiUser, FiSettings, FiActivity, FiBell } from "react-icons/fi";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -289,25 +290,25 @@ const Settings = () => {
             className={`tab-btn ${activeTab === "profile" ? "active" : ""}`}
             onClick={() => setActiveTab("profile")}
           >
-            <span className="icon">👤</span> Profile Information
+            <FiUser className="icon" /> Profile Information
           </button>
           <button
             className={`tab-btn ${activeTab === "preferences" ? "active" : ""}`}
             onClick={() => setActiveTab("preferences")}
           >
-            <span className="icon">⚙️</span> App Preferences
+            <FiSettings className="icon" /> App Preferences
           </button>
           <button
             className={`tab-btn ${activeTab === "data" ? "active" : ""}`}
             onClick={() => setActiveTab("data")}
           >
-            <span className="icon">📊</span> Data Management
+            <FiActivity className="icon" /> Data Management
           </button>
           <button
             className={`tab-btn ${activeTab === "notifications" ? "active" : ""}`}
             onClick={() => setActiveTab("notifications")}
           >
-            <span className="icon">🔔</span> Notifications
+            <FiBell className="icon" /> Notifications
           </button>
         </div>
 

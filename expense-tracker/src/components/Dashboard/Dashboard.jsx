@@ -19,7 +19,12 @@ import {
   FiCalendar,
   FiZap,
   FiCpu,
-  FiTarget
+  FiTarget,
+  FiAward,
+  FiLock,
+  FiUnlock,
+  FiShield,
+  FiDollarSign
 } from "react-icons/fi";
 import "./Dashboard.css";
 
@@ -204,7 +209,7 @@ const Dashboard = () => {
         id: "first_blood",
         title: "First Blood",
         desc: "Log your first transaction",
-        icon: "🎯",
+        icon: FiTarget,
         color: "#f43f5e",
         unlocked: false
       },
@@ -212,7 +217,7 @@ const Dashboard = () => {
         id: "centurion",
         title: "Active Tracker",
         desc: "Log 10+ transactions",
-        icon: "🔥",
+        icon: FiZap,
         color: "#f59e0b",
         unlocked: false
       },
@@ -220,7 +225,7 @@ const Dashboard = () => {
         id: "big_earner",
         title: "Big Earner",
         desc: "Log an income over 10,000",
-        icon: "💰",
+        icon: FiDollarSign,
         color: "#10b981",
         unlocked: false
       },
@@ -228,7 +233,7 @@ const Dashboard = () => {
         id: "budget_master",
         title: "Budget Master",
         desc: "Stay under all active budgets",
-        icon: "🛡️",
+        icon: FiShield,
         color: "#4f46e5",
         unlocked: false
       }
@@ -249,7 +254,7 @@ const Dashboard = () => {
     <div className="dashboard-content">
       <header className="header">
         <div className="greeting">
-          <h1>Hello, {name} 👋</h1>
+          <h1>Hello, {name}</h1>
           <p>Welcome back to your financial dashboard.</p>
         </div>
         <button className="add-btn" onClick={() => navigate("/transactions")}>
@@ -374,7 +379,7 @@ const Dashboard = () => {
           <div className="achievements-card glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
             <div className="achievements-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '22px' }}>🏆</span> Your Achievements
+                <FiAward style={{ fontSize: '22px', color: '#eab308' }} /> Your Achievements
               </h3>
               <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>{unlockedCount}/{achievements.length} Unlocked</span>
             </div>
@@ -404,7 +409,7 @@ const Dashboard = () => {
                       flexShrink: 0, 
                       filter: ach.unlocked ? 'none' : 'grayscale(100%)' 
                   }}>
-                    {ach.unlocked ? ach.icon : '🔒'}
+                    {ach.unlocked ? <ach.icon size={22} style={{ color: ach.color }} /> : <FiLock size={22} />}
                   </div>
                   <div className="ach-info">
                     <h4 style={{ fontSize: '15px', fontWeight: '700', color: ach.unlocked ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '2px' }}>{ach.title}</h4>
@@ -524,7 +529,7 @@ const Dashboard = () => {
 
           <div className="ai-advisor-card glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px', background: 'linear-gradient(145deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
             <div className="ai-advisor-header" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '24px' }}>🤖</span>
+              <FiCpu style={{ fontSize: '24px', color: '#6366f1' }} />
               <h3 style={{ fontSize: '18px', fontWeight: '700', background: 'linear-gradient(90deg, #6366f1, #10b981)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
                 AI Financial Advisor
               </h3>

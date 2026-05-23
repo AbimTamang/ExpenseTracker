@@ -228,6 +228,29 @@
   color: #3b82f6;
 }
 
+.input-with-icon input.password-field {
+  padding-right: 48px !important;
+}
+
+.password-toggle-btn {
+  position: absolute !important;
+  right: 16px !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #94a3b8 !important;
+  z-index: 10 !important;
+  transition: color 0.2s ease !important;
+}
+
+.password-toggle-btn:hover {
+  color: #3b82f6 !important;
+}
+
 /* OPTIONS (REMEMBER / FORGOT) */
 .options {
   display: flex;

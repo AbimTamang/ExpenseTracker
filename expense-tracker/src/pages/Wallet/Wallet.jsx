@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Wallet.css";
 import { useNavigate, Link } from "react-router-dom";
+import { FiCreditCard, FiTrendingUp, FiTarget, FiFileText, FiHelpCircle, FiClock } from "react-icons/fi";
 
 const Wallet = () => {
   const navigate = useNavigate();
@@ -117,13 +118,13 @@ const Wallet = () => {
 
       <div className="tab-container">
         <button className={`tab-btn ${activeTab === "wallets" ? "active" : ""}`} onClick={() => setActiveTab("wallets")}>
-          💳 Digital Wallets
+          <FiCreditCard style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Digital Wallets
         </button>
         <button className={`tab-btn ${activeTab === "investments" ? "active" : ""}`} onClick={() => setActiveTab("investments")}>
-          📈 Investments Portfolio
+          <FiTrendingUp style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Investments Portfolio
         </button>
         <button className={`tab-btn ${activeTab === "goals" ? "active" : ""}`} onClick={() => setActiveTab("goals")}>
-          🎯 Saving Goals
+          <FiTarget style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Saving Goals
         </button>
       </div>
 
@@ -144,7 +145,7 @@ const Wallet = () => {
                   Nepal's #1 digital wallet. Upload your eSewa statement to auto-import all your transactions.
                 </p>
                 <Link to="/import-statement" className="dw-import-btn esewa-btn">
-                  📄 Import eSewa Statement
+                  <FiFileText style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Import eSewa Statement
                 </Link>
               </div>
 
@@ -161,13 +162,13 @@ const Wallet = () => {
                   Nepal's smart digital wallet. Upload your Khalti statement to auto-import all your transactions.
                 </p>
                 <Link to="/import-statement" className="dw-import-btn khalti-btn">
-                  📄 Import Khalti Statement
+                  <FiFileText style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Import Khalti Statement
                 </Link>
               </div>
             </div>
 
             <div className="dw-info-box">
-              <h4>💡 How it works</h4>
+              <h4><FiHelpCircle style={{ marginRight: '8px', verticalAlign: 'middle' }} /> How it works</h4>
               <ol>
                 <li>Open your <strong>eSewa</strong> or <strong>Khalti</strong> app</li>
                 <li>Go to <strong>Statement</strong> and download your monthly PDF</li>
@@ -241,7 +242,7 @@ const Wallet = () => {
                       <h3>{item.title}</h3>
                       <button className="delete-icon" onClick={() => deleteGoal(item.id)}>✕</button>
                     </div>
-                    <p className="goal-deadline">⏱️ Target Date: {new Date(item.deadline).toLocaleDateString()}</p>
+                    <p className="goal-deadline"><FiClock style={{ marginRight: '6px', verticalAlign: 'middle' }} /> Target Date: {new Date(item.deadline).toLocaleDateString()}</p>
 
                     <div className="progress-container">
                       <div className="progress-bar" style={{ width: `${progress}%` }}></div>

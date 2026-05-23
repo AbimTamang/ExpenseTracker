@@ -88,7 +88,7 @@ const Budgets = () => {
         <div className="budgets-container">
             <header className="budgets-header">
                 <div>
-                    <h1>Category Budgets 🎯</h1>
+                    <h1>Category Budgets <FiTarget style={{ verticalAlign: 'middle' }} /></h1>
                     <p>Set monthly limits to keep your spending in check.</p>
                 </div>
                 {!isAdding && (

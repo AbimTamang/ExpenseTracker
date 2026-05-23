@@ -17,7 +17,7 @@ import ResetPassword from "./components/ResetPassword/ResetPassword";
 // DASHBOARD
 import Dashboard from "./components/Dashboard/Dashboard";
 
-// TRANSACTIONS ✅ FIXED PATH
+// TRANSACTIONS [OK] FIXED PATH
 import Transactions from "./components/Transactions/Transactions";
 
 // OTHER PAGES
