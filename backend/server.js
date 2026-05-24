@@ -16,7 +16,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   ...(process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(",").map((u) => u.trim())
+    ? process.env.FRONTEND_URL.split(",").map((u) => u.trim().replace(/\/+$/, ""))
     : []),
   "https://expensetracker.kushal-karki.com.np",
   "http://localhost:5173",

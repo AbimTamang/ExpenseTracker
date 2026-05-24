@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require("../db");
 const sendEmail = require("../utils/sendEmail");
+const frontendUrl = require("../utils/frontendUrl");
 const { OAuth2Client } = require("google-auth-library");
 
 // Inline verifyToken since there doesn't seem to be a separate middleware/auth.js yet
@@ -211,7 +212,7 @@ router.post("/forgot-password", async (req, res) => {
 
     console.log("✅ Reset token saved");
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    const resetLink = frontendUrl(`/reset-password/${token}`);
     console.log("🔗 Reset link:", resetLink);
 
     await sendEmail({

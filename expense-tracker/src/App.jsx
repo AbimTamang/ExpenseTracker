@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // LAYOUT
@@ -28,12 +28,23 @@ import Budgets from "./pages/Budgets/Budgets";
 import CalendarApp from "./pages/Calendar/CalendarApp";
 import ImportStatement from "./pages/ImportStatement/ImportStatement";
 
+/** Fixes email links like //reset-password/token (trailing slash on FRONTEND_URL). */
+function NormalizePath() {
+  const { pathname, search, hash } = useLocation();
+  const fixed = pathname.replace(/\/{2,}/g, "/");
+  if (fixed !== pathname) {
+    return <Navigate to={fixed + search + hash} replace />;
+  }
+  return null;
+}
+
 function App() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
+        <NormalizePath />
         <Routes>
 
           {/* AUTH (guest-only) */}
