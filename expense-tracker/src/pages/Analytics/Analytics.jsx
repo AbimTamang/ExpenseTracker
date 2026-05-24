@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useEffect, useState } from "react";
 import "./Analytics.css";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +34,7 @@ const Analytics = () => {
   // Fetch data
   useEffect(() => {
     if (!token) return;
-    fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
+    fetch(apiUrl(`/expenses/list`), {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -109,7 +110,7 @@ const Analytics = () => {
     formData.append("file", statementFile);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/upload-statement`, {
+      const res = await fetch(apiUrl(`/expenses/upload-statement`), {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

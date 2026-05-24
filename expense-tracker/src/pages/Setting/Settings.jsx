@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import "./Settings.css";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +27,7 @@ const Settings = () => {
 
   useEffect(() => {
     if (!token) return;
-    fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+    fetch(apiUrl(`/auth/profile`), {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -47,7 +48,7 @@ const Settings = () => {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+      const res = await fetch(apiUrl(`/auth/profile`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +80,7 @@ const Settings = () => {
       return;
     }
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/change-password`, {
+      const res = await fetch(apiUrl(`/auth/change-password`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +110,7 @@ const Settings = () => {
     if (field === 'new_login_alerts') setNewLoginAlerts(value);
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+      await fetch(apiUrl(`/auth/profile`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +129,7 @@ const Settings = () => {
   const handleExportPDF = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
+      const res = await fetch(apiUrl(`/expenses/list`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -206,7 +207,7 @@ const Settings = () => {
     if (!token) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/export`, {
+      const res = await fetch(apiUrl(`/expenses/export`), {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -233,7 +234,7 @@ const Settings = () => {
     if (!window.confirm("WARNING: This will erase all your transactions, investments, and goals. Your login will remain. Proceed?")) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-data`, {
+      const res = await fetch(apiUrl(`/auth/reset-data`), {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -254,7 +255,7 @@ const Settings = () => {
     if (!window.confirm("DANGER: This will permanently delete your entire account and all data. This cannot be undone. Proceed?")) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/delete-account`, {
+      const res = await fetch(apiUrl(`/auth/delete-account`), {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });

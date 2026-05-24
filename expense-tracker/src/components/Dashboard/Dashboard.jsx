@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -62,7 +63,7 @@ const Dashboard = () => {
   // FETCH SUMMARY
   const fetchSummary = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/summary`, {
+      const res = await fetch(apiUrl(`/expenses/summary`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -75,7 +76,7 @@ const Dashboard = () => {
   // FETCH TRANSACTIONS
   const fetchTransactions = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
+      const res = await fetch(apiUrl(`/expenses/list`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -92,7 +93,7 @@ const Dashboard = () => {
 
   const fetchBudgetStats = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/stats`, {
+      const res = await fetch(apiUrl(`/budgets/stats`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -105,7 +106,7 @@ const Dashboard = () => {
   const fetchInsights = async () => {
     try {
       setLoadingInsights(true);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/insights`, {
+      const res = await fetch(apiUrl(`/expenses/insights`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -190,7 +191,7 @@ const Dashboard = () => {
   const deleteTransaction = async (id) => {
     if (!window.confirm("Are you sure you want to delete this transaction?")) return;
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/expenses/delete/${id}`, {
+      await fetch(apiUrl(`/expenses/delete/${id}`), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });

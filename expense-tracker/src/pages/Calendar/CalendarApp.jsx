@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
@@ -16,7 +17,7 @@ const CalendarApp = () => {
 
     const fetchTransactions = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
+            const res = await fetch(apiUrl(`/expenses/list`), {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await res.json();

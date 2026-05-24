@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import "./Login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +26,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      const res = await fetch(apiUrl(`/auth/login`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +58,7 @@ const Login = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/google`, {
+      const res = await fetch(apiUrl(`/auth/google`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: credentialResponse.credential }),
@@ -88,7 +89,7 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-google-otp`, {
+      const res = await fetch(apiUrl(`/auth/verify-google-otp`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailForOtp, otp }),

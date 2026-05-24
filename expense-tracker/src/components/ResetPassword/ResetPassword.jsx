@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
@@ -33,7 +34,7 @@ const ResetPassword = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/reset-password`,
+        apiUrl(`/auth/reset-password`),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

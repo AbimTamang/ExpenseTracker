@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -40,7 +41,7 @@ const Transactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/list`, {
+      const res = await fetch(apiUrl(`/expenses/list`), {
         headers: { Authorization: `Bearer ${token} ` },
       });
       const data = await res.json();
@@ -72,7 +73,7 @@ const Transactions = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/add`, {
+      const res = await fetch(apiUrl(`/expenses/add`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +98,7 @@ const Transactions = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this transaction?")) return;
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/expenses/delete/${id}`, {
+      await fetch(apiUrl(`/expenses/delete/${id}`), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
@@ -19,7 +20,7 @@ const ForgotPassword = () => {
       setLoading(true);
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
+        apiUrl(`/auth/forgot-password`),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

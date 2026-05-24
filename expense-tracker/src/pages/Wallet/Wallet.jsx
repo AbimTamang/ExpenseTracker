@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import "./Wallet.css";
 import { useNavigate, Link } from "react-router-dom";
@@ -28,13 +29,13 @@ const Wallet = () => {
   }, []);
 
   const fetchInvestments = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/investments/list`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(apiUrl(`/investments/list`), { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     if (data.success) setInvestments(data.data);
   };
 
   const fetchGoals = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/list`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(apiUrl(`/goals/list`), { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     if (data.success) setGoals(data.data);
   };
@@ -45,7 +46,7 @@ const Wallet = () => {
       alert("Investment amount must be a positive number.");
       return;
     }
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/investments/add`, {
+    const res = await fetch(apiUrl(`/investments/add`), {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ title: invTitle, amount: invAmount, category: invCategory })
@@ -59,7 +60,7 @@ const Wallet = () => {
   };
 
   const deleteInvestment = async (id) => {
-    await fetch(`${import.meta.env.VITE_API_URL}/investments/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(apiUrl(`/investments/delete/${id}`), { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     fetchInvestments();
   };
 
@@ -69,7 +70,7 @@ const Wallet = () => {
       alert("Target amount must be a positive number.");
       return;
     }
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/add`, {
+    const res = await fetch(apiUrl(`/goals/add`), {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ title: goalTitle, target_amount: goalTargetAmount, deadline: goalDeadline })
@@ -88,7 +89,7 @@ const Wallet = () => {
       alert("Deposit amount must be a positive number.");
       return;
     }
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/goals/add-funds/${id}`, {
+    const res = await fetch(apiUrl(`/goals/add-funds/${id}`), {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ amount })
@@ -103,7 +104,7 @@ const Wallet = () => {
   };
 
   const deleteGoal = async (id) => {
-    await fetch(`${import.meta.env.VITE_API_URL}/goals/delete/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    await fetch(apiUrl(`/goals/delete/${id}`), { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     fetchGoals();
   };
 

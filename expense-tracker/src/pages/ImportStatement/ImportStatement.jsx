@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -70,7 +71,7 @@ const ImportStatement = () => {
             const formData = new FormData();
             formData.append("file", file);
 
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/parse-wallet-statement`, {
+            const res = await fetch(apiUrl(`/expenses/parse-wallet-statement`), {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData
@@ -136,7 +137,7 @@ const ImportStatement = () => {
 
         setIsImporting(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/expenses/import-bulk`, {
+            const res = await fetch(apiUrl(`/expenses/import-bulk`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

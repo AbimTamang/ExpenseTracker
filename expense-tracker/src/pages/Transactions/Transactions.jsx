@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Transactions.css";
@@ -35,7 +36,7 @@ const Transactions = () => {
 
     try {
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/transactions`, {
+      const res = await fetch(apiUrl(`/transactions`), {
 
         headers: {
           Authorization: `Bearer ${token}`
@@ -82,7 +83,7 @@ const Transactions = () => {
       return;
     }
 
-    await fetch(`${import.meta.env.VITE_API_URL}/transactions`, {
+    await fetch(apiUrl(`/transactions`), {
 
       method: "POST",
 

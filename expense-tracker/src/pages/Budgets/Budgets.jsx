@@ -1,3 +1,4 @@
+import { apiUrl } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { FiTarget, FiPlus, FiEdit2, FiCheck, FiX, FiPieChart, FiTrash2 } from "react-icons/fi";
 import "./Budgets.css";
@@ -14,7 +15,7 @@ const Budgets = () => {
 
     const fetchBudgets = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/stats`, {
+            const res = await fetch(apiUrl(`/budgets/stats`), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -39,7 +40,7 @@ const Budgets = () => {
         }
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/upsert`, {
+            const res = await fetch(apiUrl(`/budgets/upsert`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,7 +65,7 @@ const Budgets = () => {
     const handleDelete = async (category) => {
         if (window.confirm(`Are you sure you want to delete the budget for ${category}?`)) {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/budgets/${category}`, {
+                const res = await fetch(apiUrl(`/budgets/${category}`), {
                     method: "DELETE",
                     headers: { "Authorization": `Bearer ${token}` }
                 });
