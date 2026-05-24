@@ -41,7 +41,10 @@ const Login = () => {
         localStorage.setItem("name", data.name);
 
         // Slight delay for smooth animation before navigating
-        setTimeout(() => navigate("/dashboard"), 600);
+        setTimeout(() => {
+          setIsLoading(false);
+          navigate("/dashboard");
+        }, 600);
       } else {
         alert(data.message || "Invalid credentials. Please try again.");
         setIsLoading(false);
