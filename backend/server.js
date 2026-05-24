@@ -22,17 +22,23 @@ const allowedOrigins = [
   "http://localhost:5174",
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error(`CORS: origin ${origin} not allowed`));
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`CORS blocked origin: ${origin}`);
+    console.warn(`Allowed origins: ${allowedOrigins.join(", ")}`);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+// Handle preflight OPTIONS requests for all routes
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Required for Chrome's Private Network Access policy
 app.use((req, res, next) => {
@@ -41,6 +47,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
 
 
 
