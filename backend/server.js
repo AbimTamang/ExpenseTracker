@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 const authRoutes = require("./routes/auth");
 const expenseRoutes = require("./routes/expenses");
@@ -36,8 +36,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// Handle preflight OPTIONS requests for all routes
-app.options("*", cors(corsOptions));
+// Handle preflight OPTIONS requests for all routes (regex works across Express v4 & v5)
+app.options(/.*/, cors(corsOptions));
 app.use(cors(corsOptions));
 
 // Required for Chrome's Private Network Access policy
