@@ -1,0 +1,546 @@
+/**
+ * Global responsive styles for Fintrack
+ * Breakpoints: 480px (sm), 768px (md), 992px (lg), 1200px (xl)
+ */
+
+:root {
+  --page-px: clamp(1rem, 4vw, 2.5rem);
+  --page-py: clamp(1rem, 3vh, 2.5rem);
+  --touch-min: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Prevent horizontal scroll from 100vw on auth pages */
+.login-container,
+.signup-container {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* App pages — fluid padding */
+.dashboard-content,
+.transactions-page,
+.analytics-page {
+  padding: var(--page-py) var(--page-px) !important;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.settings-page {
+  padding: var(--page-py) var(--page-px) !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.wallet-page,
+.budgets-container,
+.import-page,
+.calendar-page {
+  padding-left: var(--page-px) !important;
+  padding-right: var(--page-px) !important;
+  padding-top: var(--page-py) !important;
+  padding-bottom: var(--page-py) !important;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.main-content {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Tablet: stack multi-column layouts */
+@media (max-width: 1200px) {
+  .dashboard-grid,
+  .charts-grid,
+  .calendar-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .transactions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .form-card {
+    position: static !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .layout-container {
+    min-height: 100dvh;
+  }
+
+  .main-content {
+    min-height: calc(100dvh - 56px);
+  }
+
+  /* Page headers stack */
+  .header,
+  .budgets-header,
+  .top-bar,
+  .page-header,
+  .header-section,
+  .parsed-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .header-section h1,
+  .page-header h1,
+  .greeting h1,
+  .budgets-header h1 {
+    font-size: clamp(1.35rem, 5vw, 1.75rem) !important;
+    line-height: 1.2;
+  }
+
+  .greeting p,
+  .page-header p,
+  .header-section p {
+    font-size: 0.9rem !important;
+  }
+
+  .add-btn,
+  .add-budget-btn,
+  .parse-btn,
+  .import-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Summary & grids → single column */
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .card {
+    padding: 1.25rem !important;
+  }
+
+  .card-value {
+    font-size: clamp(1.35rem, 6vw, 1.75rem) !important;
+    word-break: break-word;
+  }
+
+  /* Dashboard widgets */
+  .lookup-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .lookup-input-wrapper {
+    width: 100%;
+  }
+
+  .lookup-input-wrapper input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .today-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .today-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .recent-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .transaction-item {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem !important;
+  }
+
+  .transaction-amount-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .insight-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .insight-day-box {
+    width: 100%;
+  }
+
+  .ai-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .chart-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .chart-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  /* Analytics */
+  .period-filters {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .period-filters button {
+    flex: 1 1 auto;
+    min-width: calc(33% - 8px);
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .upload-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Transactions form */
+  .form-card {
+    padding: 1.25rem !important;
+  }
+
+  .history-section {
+    min-width: 0;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .history-item-card {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .submit-entry-btn {
+    width: 100%;
+  }
+
+  /* Wallet */
+  .tab-container {
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+    margin: 1rem 0 !important;
+  }
+
+  .tab-container .tab-btn {
+    flex: 1 1 calc(50% - 0.35rem);
+    min-width: 0;
+    padding: 12px 10px !important;
+    font-size: 13px !important;
+  }
+
+  .digital-wallets-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .add-card {
+    padding: 1.25rem !important;
+  }
+
+  .transaction-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .transaction-card .right {
+    text-align: left !important;
+    width: 100%;
+  }
+
+  .goals-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .goal-card {
+    padding: 1.25rem !important;
+  }
+
+  .fund-section {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem;
+  }
+
+  .fund-section input,
+  .fund-section button {
+    width: 100%;
+  }
+
+  /* Budgets */
+  .budgets-header {
+    text-align: left;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .budget-form-card {
+    padding: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .budgets-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Import */
+  .wallet-selector {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .wallet-option {
+    width: 100% !important;
+    max-width: none !important;
+    justify-content: center;
+  }
+
+  .drop-zone {
+    padding: 2rem 1rem !important;
+  }
+
+  .parsed-summary-bar,
+  .parsed-item {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .parsed-actions {
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  /* Calendar */
+  .calendar-wrapper-card,
+  .day-details-card {
+    padding: 1rem !important;
+  }
+
+  .glass-calendar .react-calendar__tile {
+    height: auto !important;
+    min-height: 48px;
+    padding: 4px 2px !important;
+    font-size: 11px !important;
+  }
+
+  .calendar-tile-content {
+    display: none;
+  }
+
+  .calendar-controls {
+    justify-content: center;
+  }
+
+  .filter-group {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .cal-filter-btn {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px !important;
+    padding: 8px 8px !important;
+  }
+
+  .day-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Auth forms */
+  .login-right,
+  .signup-left {
+    padding: clamp(1rem, 4vw, 1.5rem) !important;
+    min-height: 100dvh;
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+  }
+
+  .form-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .login-header h2,
+  .signup-header h2 {
+    font-size: clamp(1.5rem, 5vw, 1.75rem) !important;
+  }
+
+  .options {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .divider {
+    margin: 1.25rem 0 !important;
+  }
+
+  /* Forgot / reset password */
+  .fp-card {
+    width: calc(100% - 2rem) !important;
+    max-width: 420px;
+    margin: 1rem;
+    padding: 1.5rem !important;
+    box-sizing: border-box;
+  }
+
+  .rp-card {
+    margin: 1rem;
+    padding: 1.5rem 1.25rem !important;
+    box-sizing: border-box;
+  }
+
+  /* iOS: avoid zoom on input focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Touch targets */
+  button,
+  .nav-item,
+  .tab-btn,
+  .burger-btn {
+    min-height: var(--touch-min);
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  :root {
+    --page-px: 1rem;
+    --page-py: 1rem;
+  }
+
+  .mobile-header {
+    padding: 12px 16px !important;
+  }
+
+  .brand h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .sidebar {
+    width: min(280px, 85vw) !important;
+  }
+
+  .period-filters button {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .tab-container .tab-btn {
+    flex: 1 1 100%;
+  }
+
+  .signup-success-modal {
+    padding: 1.5rem !important;
+    width: calc(100% - 2rem) !important;
+  }
+
+  .modal-content {
+    padding: 1.25rem !important;
+    margin: 0.75rem !important;
+    max-width: calc(100% - 1.5rem) !important;
+  }
+}
+
+/* Safe area for notched phones */
+@supports (padding: max(0px)) {
+  .mobile-header {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .dashboard-content,
+  .transactions-page,
+  .settings-page,
+  .wallet-page,
+  .budgets-container,
+  .analytics-page,
+  .import-page,
+  .calendar-page {
+    padding-bottom: max(var(--page-py), env(safe-area-inset-bottom)) !important;
+  }
+}

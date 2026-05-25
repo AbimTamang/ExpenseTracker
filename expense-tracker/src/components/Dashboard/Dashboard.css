@@ -713,8 +713,42 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard-content {
-    padding: 20px;
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lookup-card,
+  .today-box,
+  .ai-advisor-card,
+  .chart-container,
+  .insights-card,
+  .budget-watch-card {
+    padding: 1.25rem;
+  }
+
+  .lookup-stat-value {
+    font-size: clamp(1.1rem, 5vw, 1.5rem);
+  }
+
+  .view-all {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .insight-bubble {
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 

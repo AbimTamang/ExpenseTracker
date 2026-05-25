@@ -16,6 +16,40 @@
     }
 }
 
+@media (max-width: 768px) {
+    .calendar-wrapper-card,
+    .day-details-card {
+        padding: 1rem;
+    }
+
+    .glass-calendar .react-calendar__tile {
+        height: auto;
+        min-height: 44px;
+        font-size: 12px;
+        padding: 4px 2px;
+    }
+
+    .calendar-tile-content {
+        display: none;
+    }
+
+    .filter-group {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .cal-filter-btn {
+        flex: 1;
+        font-size: 12px;
+        padding: 8px 6px;
+    }
+
+    .day-summary {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
 .calendar-wrapper-card, .day-details-card {
     background: var(--bg-card);
     border-radius: 24px;

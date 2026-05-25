@@ -378,11 +378,28 @@
 
   .signup-left {
     width: 100%;
-    padding: 20px;
+    padding: clamp(1rem, 4vw, 1.5rem);
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding-top: 2rem;
   }
 
   .mobile-brand-logo {
     display: block;
+  }
+
+  .form-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .signup-form .input-group {
+    margin-bottom: 1rem;
   }
 }
 

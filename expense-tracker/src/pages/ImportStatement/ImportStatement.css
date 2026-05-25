@@ -471,26 +471,45 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .import-page .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
     .wallet-selector {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
     }
 
     .wallet-option {
         width: 100%;
-        max-width: 280px;
+        max-width: none;
         justify-content: center;
     }
 
     .drop-zone {
-        padding: 40px 20px;
+        padding: 2rem 1rem;
     }
 
-    .parsed-summary-bar {
+    .parsed-summary-bar,
+    .parsed-header {
         flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
     }
 
     .parsed-item {
         flex-wrap: wrap;
+    }
+
+    .parsed-actions {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .parse-btn,
+    .import-btn {
+        width: 100%;
     }
 }

@@ -365,7 +365,45 @@
 }
 
 @media (max-width: 768px) {
-  .transactions-page {
-    padding: 24px;
+  .page-header .header-info {
+    width: 100%;
+  }
+
+  .form-card {
+    padding: 1.25rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .filter-wrapper {
+    width: 100%;
+  }
+
+  .filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .submit-entry-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-item-card {
+    padding: 12px;
+  }
+
+  .item-details h4 {
+    font-size: 14px;
   }
 }
