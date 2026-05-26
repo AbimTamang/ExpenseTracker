@@ -226,7 +226,7 @@ router.post("/forgot-password", async (req, res) => {
       `,
     });
 
-    console.log("✅ Reset email sent");
+    console.log("Reset email sent");
     res.json({ success: true });
   } catch (err) {
     console.error("🔥 Forgot password error:", err);

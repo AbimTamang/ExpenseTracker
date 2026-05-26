@@ -19,12 +19,12 @@
 
 .budgets-header h1 {
     font-size: 2rem;
-    color: #1e293b;
+    color: var(--text-main);
     margin-bottom: 0.5rem;
 }
 
 .budgets-header p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .add-budget-btn {
@@ -47,12 +47,12 @@
 
 /* FORM CARD */
 .budget-form-card {
-    background: white;
+    background: var(--bg-card);
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     margin-bottom: 3rem;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color);
 }
 
 .form-row {
@@ -70,19 +70,21 @@
 
 .form-group label {
     font-weight: 500;
-    color: #475569;
+    color: var(--text-main);
 }
 
 .form-group select, .form-group input {
     padding: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     font-size: 1rem;
     transition: border 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-main);
 }
 
 .form-group select:focus, .form-group input:focus {
-    border-color: #6366f1;
+    border-color: var(--primary);
     outline: none;
 }
 
@@ -108,7 +110,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -120,10 +122,10 @@
 }
 
 .budget-progress-card {
-    background: white;
+    background: var(--bg-card);
     padding: 1.5rem;
     border-radius: 20px;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color);
     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
     transition: transform 0.3s ease;
 }
@@ -212,7 +214,7 @@
 
 .spent-text {
     font-size: 0.9rem;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 500;
 }
 

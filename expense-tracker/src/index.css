@@ -43,6 +43,12 @@
   --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-danger: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
   --gradient-bg: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+  
+  /* Compatibility variables */
+  --primary-color: var(--primary);
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --shadow-color: rgba(0, 0, 0, 0.05);
 }
 
 [data-theme='dark'] {
@@ -54,6 +60,12 @@
   --text-muted: #94a3b8;
   --border-color: rgba(51, 65, 85, 0.5);
   --input-bg: rgba(15, 23, 42, 0.6);
+  
+  /* Compatibility variables */
+  --primary-color: var(--primary-light);
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --shadow-color: rgba(0, 0, 0, 0.4);
   
   /* Dark Glassmorphism */
   --glass-bg: rgba(15, 23, 42, 0.6);
